@@ -1,5 +1,8 @@
 # KOReaderHistFavParser
-Parser (read and write) for KOReader([Homepage](https://koreader.rocks), [Github repository](https://github.com/koreader/koreader)) history, favorites and book status for external usage in Android applications
+Parser (read and write) for KOReader ([Homepage](https://koreader.rocks), [Github repository](https://github.com/koreader/koreader)) history, favorites and book status for external usage in Android applications
+
+## Documentation
+Documentation of the Java classes can be found [here](https://mahlzahn.github.io/koreaderhistfavparser).
 
 ## Usage
 ```java
