@@ -30,7 +30,7 @@ public class KOReaderBook {
      *
      * @param filePath the file path
      */
-    public KOReaderBook(String filePath) {
+    public KOReaderBook(String filePath) throws IllegalArgumentException {
         this.filePath = filePath;
         sdrFilePath = sdrFilePath(filePath);
     }
@@ -346,10 +346,14 @@ public class KOReaderBook {
         this.stringFormat = stringFormat;
     }
 
-    private String sdrFilePath(String filePath) {
-        String filePathWithoutExt = filePath.substring(0, filePath.lastIndexOf("."));
-        String filePathExt = filePath.substring(filePath.lastIndexOf("."));
-        return filePathWithoutExt + ".sdr/metadata" + filePathExt + ".lua";
+    private String sdrFilePath(String filePath) throws IllegalArgumentException {
+        try {
+            String filePathWithoutExt = filePath.substring(0, filePath.lastIndexOf("."));
+            String filePathExt = filePath.substring(filePath.lastIndexOf("."));
+            return filePathWithoutExt + ".sdr/metadata" + filePathExt + ".lua";
+        } catch (StringIndexOutOfBoundsException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     /**
