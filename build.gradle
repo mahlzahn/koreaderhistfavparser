@@ -1,13 +1,17 @@
 apply plugin: 'com.android.library'
 
-android {
-    compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION) //28
-    buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION //"28.0.3"
-
-    defaultConfig {
-        minSdkVersion Integer.parseInt(project.ANDROID_BUILD_MIN_SDK_VERSION) //7
-        targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION) //15
+buildscript {
+    repositories {
+        jcenter()
     }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.3.1'
+    }
+}
+
+android {
+    compileSdkVersion = 28
+    buildToolsVersion = '28.0.3'
     compileOptions {
         sourceCompatibility = 1.7
         targetCompatibility = 1.7
