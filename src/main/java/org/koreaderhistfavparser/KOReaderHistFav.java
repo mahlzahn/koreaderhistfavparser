@@ -15,6 +15,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
+/**
+ * The class for KOReader history and favorites management.
+ */
 public class KOReaderHistFav {
     private final static String TAG = "KOReaderHistFav";
 
@@ -38,10 +41,22 @@ public class KOReaderHistFav {
     private ArrayList<KOReaderBook> history = new ArrayList<>();
     private ArrayList<KOReaderBook> favorites = new ArrayList<>();
 
+    /**
+     * Constructs a new KOReaderHistFav. Searches in external storage and external SD card storage
+     * for the settings directory with the name koreader.
+     *
+     * @throws FileNotFoundException if KOReader settings directory not found
+     */
     public KOReaderHistFav() throws FileNotFoundException {
         this(null);
     }
 
+    /**
+     * Constructs a new KOReaderHistFav from given settings directory.
+     *
+     * @param koreaderDirectoryPath the koreader directory path
+     * @throws FileNotFoundException if KOReader settings directory not found
+     */
     public KOReaderHistFav(String koreaderDirectoryPath) throws FileNotFoundException {
         try {
             externalStoragePath = Environment.getExternalStorageDirectory().getCanonicalPath();
@@ -61,18 +76,38 @@ public class KOReaderHistFav {
             readBooksFromFavorites();
     }
 
+    /**
+     * Returns the KOReader settings directory path.
+     *
+     * @return the KOReader settings directory path
+     */
     public String getKoreaderDirectoryPath() {
         return koreaderDirectoryPath;
     }
 
+    /**
+     * Returns the KOReader history file path.
+     *
+     * @return the kOReader history file path
+     */
     public String getKoreaderHistoryFilePath() {
         return historyFilePath;
     }
 
+    /**
+     * Returns the KOReader collection file path.
+     *
+     * @return the KOReader collection file path
+     */
     public String getKoreaderCollectionFilePath() {
         return collectionFilePath;
     }
 
+    /**
+     * Returns the library with all books from favorites and history import.
+     *
+     * @return the library
+     */
     public HashMap<String, KOReaderBook> getLibrary() {
         if (historyFileModified() && readHistory())
             readBooksFromHistory();
@@ -81,6 +116,12 @@ public class KOReaderHistFav {
         return books;
     }
 
+    /**
+     * Returns the book for given file path.
+     *
+     * @param filePath the book file path
+     * @return the book
+     */
     public KOReaderBook getBook(String filePath) {
         if (historyFileModified() && readHistory())
             readBooksFromHistory();
@@ -89,18 +130,34 @@ public class KOReaderHistFav {
         return books.get(uniqueFilePath(filePath));
     }
 
+    /**
+     * Returns the list of books in history, sorted by last reading (last read book first).
+     *
+     * @return the history
+     */
     public ArrayList<KOReaderBook> getHistory() {
         if (historyFileModified() && readHistory())
             readBooksFromHistory();
         return history;
     }
 
+    /**
+     * Returns the list of books in favorites, sorted by last added (last added book first).
+     *
+     * @return the favorites
+     */
     public ArrayList<KOReaderBook> getFavorites() {
         if (collectionFileModified() && readFavorites())
             readBooksFromFavorites();
         return favorites;
     }
 
+    /**
+     * Add book to library.
+     *
+     * @param filePath the book file path
+     * @return true if successfully, otherwise false
+     */
     public Boolean addBookToLibrary(String filePath) {
         filePath = uniqueFilePath(filePath);
         KOReaderBook book = books.get(filePath);
@@ -114,6 +171,12 @@ public class KOReaderHistFav {
         }
     }
 
+    /**
+     * Remove book from library (and favorites and history).
+     *
+     * @param filePath the book file path
+     * @return true if successfully, otherwise false
+     */
     public Boolean removeBookFromLibrary(String filePath) {
         filePath = uniqueFilePath(filePath);
         KOReaderBook book = books.get(filePath);
@@ -134,6 +197,13 @@ public class KOReaderHistFav {
             return false;
     }
 
+    /**
+     * Add book to history (and library). If book already in history, move book to first position.
+     * Sets book's last reading time to current time.
+     *
+     * @param filePath the book file path
+     * @return true if successfully, otherwise false
+     */
     public Boolean addBookToHistory(String filePath) {
         filePath = uniqueFilePath(filePath);
         KOReaderBook book = books.get(filePath);
@@ -148,6 +218,12 @@ public class KOReaderHistFav {
         return writeHistory();
     }
 
+    /**
+     * Remove book from history.
+     *
+     * @param filePath the book file path
+     * @return true if successfully, otherwise false
+     */
     public Boolean removeBookFromHistory(String filePath) {
         filePath = uniqueFilePath(filePath);
         KOReaderBook book = books.get(filePath);
@@ -157,6 +233,13 @@ public class KOReaderHistFav {
             return false;
     }
 
+    /**
+     * Add book to favorites (and library). If book already in favorites, move book to first
+     * position.
+     *
+     * @param filePath the book file path
+     * @return true if successfully, otherwise false
+     */
     public Boolean addBookToFavorites(String filePath) {
         filePath = uniqueFilePath(filePath);
         KOReaderBook book = books.get(filePath);
@@ -170,6 +253,12 @@ public class KOReaderHistFav {
         return writeFavorites();
     }
 
+    /**
+     * Remove book from favorites.
+     *
+     * @param filePath the book file path
+     * @return true if successfully, otherwise false
+     */
     public Boolean removeBookFromFavorites(String filePath) {
         filePath = uniqueFilePath(filePath);
         KOReaderBook book = books.get(filePath);

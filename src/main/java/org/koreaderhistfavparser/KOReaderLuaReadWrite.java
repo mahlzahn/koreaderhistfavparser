@@ -10,7 +10,17 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 
+/**
+ * A class with static functions to read and write lua files and convert their data to or from JSON
+ * objects.
+ */
 class KOReaderLuaReadWrite {
+    /**
+     * Reads the given lua file and converts the content to a json object.
+     *
+     * @param filePath the file path of the lua file
+     * @return the converted json object, if reading and conversion successful, otherwise null
+     */
     static JSONObject readLuaFile(String filePath) {
         BufferedReader reader;
         try {
@@ -47,6 +57,13 @@ class KOReaderLuaReadWrite {
         }
     }
 
+    /**
+     * Converts the given JSON object and writes the content to the lua file with given file path.
+     *
+     * @param filePath   the file path of the lua file
+     * @param jsonObject the json object to be converted
+     * @return true if conversion and writing successful, otherwise false
+     */
     static Boolean writeLuaFile(String filePath, JSONObject jsonObject) {
         String content;
         try {
