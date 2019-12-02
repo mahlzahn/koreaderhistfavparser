@@ -352,7 +352,8 @@ public class KOReaderBook {
             String filePathExt = filePath.substring(filePath.lastIndexOf("."));
             return filePathWithoutExt + ".sdr/metadata" + filePathExt + ".lua";
         } catch (StringIndexOutOfBoundsException e) {
-            throw new IllegalArgumentException(e);
+            throw new IllegalArgumentException("Given file path " + filePath
+                    + " invalid. Missing extension?", e);
         }
     }
 
