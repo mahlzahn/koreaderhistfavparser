@@ -23,7 +23,7 @@ public class KOReaderBook {
     private Long sdrFileLastModified = (long) 0;
     private JSONObject sdrJson;
     // %t: title, %a: first author, %p: progress in percent, %s: series, %l: language
-    private String stringFormat = "[%a: ]%t[ (%p%)]";
+    static private String stringFormat = "[%a: ]%t[ (%p%)]";
 
     /**
      * Constructs a new KOReaderBook with the specified file path.
@@ -51,6 +51,11 @@ public class KOReaderBook {
         return filePath.equals(book.filePath);
     }
 
+    /**
+     * Returns the hash code of the book's file path string.
+     *
+     * @return hash code
+     */
     @Override
     public int hashCode() {
         return filePath.hashCode();
@@ -77,7 +82,7 @@ public class KOReaderBook {
         String output = stringFormat;
         if (output.contains("%t")) {
             getTitle();
-            if (title != null)
+            if (title != null && !title.equals(""))
                 output = output.replace("%t", title);
         }
         if (output.contains("%a")) {
@@ -92,12 +97,12 @@ public class KOReaderBook {
         }
         if (output.contains("%s")) {
             getSeries();
-            if (series != null)
+            if (series != null && !series.equals(""))
                 output = output.replace("%s", series);
         }
         if (output.contains("%l")) {
             getLanguage();
-            if (language != null)
+            if (language != null && !language.equals(""))
                 output = output.replace("%l", language);
         }
         String r1 = "\\[[^\\[\\]]*%[tapsl][^\\[\\]]*\\]";   // matches e.g. [%a: ], [ (%p%)]
@@ -123,8 +128,8 @@ public class KOReaderBook {
         if (property != null && !sdrFileModified)
             return false;
         if (sdrFileModified)
-            readSdr();
-        return true;
+            return readSdr();
+        return sdrJson != null;  // property == null
     }
 
     /**
@@ -142,11 +147,8 @@ public class KOReaderBook {
      * @return true if book is finished, otherwise false
      */
     public Boolean getFinished() {
-        if (propertyOutdated(finished))
-            try {
-                String finishedString = sdrJson.getJSONObject("summary").getString("status");
-                finished = (finishedString.equals("complete"));
-            } catch (JSONException e) {}
+        if (sdrFileModified())
+            readSdr();
         return finished;
     }
 
@@ -205,10 +207,8 @@ public class KOReaderBook {
      * @return the percent finished; null if not extractable from sdr file
      */
     public Double getPercentFinished() {
-        if (propertyOutdated(percentFinished))
-            try {
-                percentFinished = sdrJson.getDouble("percent_finished");
-            } catch (JSONException e) {}
+        if (sdrFileModified())
+            readSdr();
         return percentFinished;
     }
 
@@ -236,10 +236,8 @@ public class KOReaderBook {
      * @return the number of pages; null if not extractable from sdr file
      */
     public Integer getPages() {
-        if (propertyOutdated(pages))
-            try {
-                pages = sdrJson.getJSONObject("stats").getInt("pages");
-            } catch (JSONException e) {}
+        if (sdrFileModified())
+            readSdr();
         return pages;
     }
 
@@ -249,10 +247,8 @@ public class KOReaderBook {
      * @return the title; null if not extractable from sdr file
      */
     public String getTitle() {
-        if (propertyOutdated(title))
-            try {
-                title = sdrJson.getJSONObject("stats").getString("title");
-            } catch (JSONException e) {}
+        if (sdrFileModified())
+            readSdr();
         return title;
     }
 
@@ -262,11 +258,8 @@ public class KOReaderBook {
      * @return the array of authors; null if not extractable from sdr file
      */
     public String[] getAuthors() {
-        if (propertyOutdated(authors))
-            try {
-                String authorsString = sdrJson.getJSONObject("stats").getString("authors");
-                authors = authorsString.split(";;;;");
-            } catch (JSONException e) {}
+        if (sdrFileModified())
+            readSdr();
         return authors;
     }
 
@@ -276,11 +269,8 @@ public class KOReaderBook {
      * @return the array of keywords; null if not extractable from sdr file
      */
     public String[] getKeywords() {
-        if (propertyOutdated(keywords))
-            try {
-                String keywordsString = sdrJson.getJSONObject("stats").getString("keywords");
-                keywords = keywordsString.split(";;;;");
-            } catch (JSONException e) {}
+        if (sdrFileModified())
+            readSdr();
         return keywords;
     }
 
@@ -290,10 +280,8 @@ public class KOReaderBook {
      * @return the language; null if not extractable from sdr file
      */
     public String getLanguage() {
-        if (propertyOutdated(keywords))
-            try {
-                language = sdrJson.getJSONObject("stats").getString("language");
-            } catch (JSONException e) {}
+        if (sdrFileModified())
+            readSdr();
         return language;
     }
 
@@ -303,10 +291,8 @@ public class KOReaderBook {
      * @return the series; null if not extractable from sdr file
      */
     public String getSeries() {
-        if (propertyOutdated(series))
-            try {
-                series = sdrJson.getJSONObject("stats").getString("series");
-            } catch (JSONException e) {}
+        if (sdrFileModified())
+            readSdr();
         return series;
     }
 
@@ -324,12 +310,12 @@ public class KOReaderBook {
      *
      * @return the string format
      */
-    public String getStringFormat() {
+    static public String getStringFormat() {
         return stringFormat;
     }
 
     /**
-     * Sets the string format for the string representation with the format classifiers
+     * Sets the string format for the string representation of all books with the format classifiers
      * <ul>
      *     <li><code>%t: title</code>,</li>
      *     <li><code>%a: first author</code>,</li>
@@ -342,8 +328,8 @@ public class KOReaderBook {
      *
      * @param stringFormat the string format
      */
-    public void setStringFormat(String stringFormat) {
-        this.stringFormat = stringFormat;
+    static public void setStringFormat(String stringFormat) {
+        KOReaderBook.stringFormat = stringFormat;
     }
 
     private String sdrFilePath(String filePath) throws IllegalArgumentException {
@@ -374,6 +360,39 @@ public class KOReaderBook {
     private Boolean readSdr() {
         sdrFileLastModified = new File(sdrFilePath).lastModified();
         sdrJson = KOReaderLuaReadWrite.readLuaFile(sdrFilePath);
+        if (sdrJson != null) {
+            JSONObject docPropsJson;
+            try {
+                String finishedString = sdrJson.getJSONObject("summary").getString("status");
+                finished = (finishedString.equals("complete"));
+            } catch (JSONException e) {}
+            try {
+                docPropsJson = sdrJson.getJSONObject("doc_props");
+                try {
+                    String authorsString = docPropsJson.getString("authors");
+                    authors = authorsString.split(";;;;");
+                } catch (JSONException e) {}
+                try {
+                    String keywordsString = docPropsJson.getString("keywords");
+                    keywords = keywordsString.split(";;;;");
+                } catch (JSONException e) {}
+                try {
+                    language = docPropsJson.getString("language");
+                } catch (JSONException e) {}
+                try {
+                    series = docPropsJson.getString("series");
+                } catch (JSONException e) {}
+                try {
+                    title = docPropsJson.getString("title");
+                } catch (JSONException e) {}
+            } catch (JSONException e) {}
+            try {
+                pages = sdrJson.getJSONObject("stats").getInt("pages");
+            } catch (JSONException e) {}
+            try {
+                percentFinished = sdrJson.getDouble("percent_finished");
+            } catch (JSONException e) {}
+        }
         return (sdrJson != null);
     }
 

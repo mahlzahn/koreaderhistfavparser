@@ -1,0 +1,93 @@
+-- we can read Lua syntax here!
+return {
+    ["font_embolden"] = 0,
+    ["copt_font_gamma"] = 15,
+    ["doc_pages"] = 57,
+    ["copt_space_condensing"] = 75,
+    ["copt_render_dpi"] = 96,
+    ["render_mode"] = 0,
+    ["highlight_drawer"] = "lighten",
+    ["bookmarks"] = {},
+    ["gamma"] = 1,
+    ["font_size"] = 22,
+    ["font_kerning"] = 3,
+    ["screen_mode"] = "portrait",
+    ["render_dpi"] = 96,
+    ["inverse_reading_order"] = false,
+    ["show_overlap_enable"] = false,
+    ["header_font_face"] = "Noto Sans",
+    ["copt_font_kerning"] = 3,
+    ["last_xpointer"] = "",
+    ["copt_visible_pages"] = 1,
+    ["copt_smooth_scaling"] = 0,
+    ["space_condensing"] = 75,
+    ["stats"] = {
+        ["performance_in_pages"] = {},
+        ["md5"] = "1ffd8a0a787b6f473e0a8757c45e3f73",
+        ["authors"] = "Max Brod\
+Franz Kafka",
+        ["total_time_in_sec"] = 0,
+        ["notes"] = 0,
+        ["title"] = "Erstes Kapitel des Buches \"Richard und Samuel\" / Die erste lange Eisenbahnfahrt (Prag-Zürich)",
+        ["highlights"] = 0,
+        ["pages"] = 57,
+        ["series"] = "",
+        ["language"] = "de"
+    },
+    ["doc_props"] = {
+        ["title"] = "Erstes Kapitel des Buches \"Richard und Samuel\" / Die erste lange Eisenbahnfahrt (Prag-Zürich)",
+        ["keywords"] = "Young men -- Fiction\
+Male friendship -- Fiction\
+Voyages and travels -- Fiction\
+Unfinished books",
+        ["description"] = "",
+        ["authors"] = "Max Brod\
+Franz Kafka",
+        ["series"] = "",
+        ["language"] = "de"
+    },
+    ["font_hinting"] = 2,
+    ["copt_nightmode_images"] = 1,
+    ["config_panel_index"] = 2,
+    ["highlights_imported"] = true,
+    ["line_space_percent"] = 100,
+    ["copt_screen_mode"] = "portrait",
+    ["copt_t_page_margin"] = 15,
+    ["floating_punctuation"] = 0,
+    ["copt_sync_t_b_page_margins"] = 0,
+    ["copt_block_rendering_mode"] = 3,
+    ["readermenu_tab_index"] = 7,
+    ["copt_font_weight"] = 0,
+    ["copt_status_line"] = 1,
+    ["visible_pages"] = 1,
+    ["font_face"] = "Noto Serif",
+    ["embedded_fonts"] = true,
+    ["percent_finished"] = 0.017543859649123,
+    ["highlight"] = {},
+    ["partial_md5_checksum"] = "5ee3e5315436b68dce371074aa627d64",
+    ["rotation_mode"] = 0,
+    ["disable_fuzzy_search"] = false,
+    ["copt_embedded_fonts"] = 1,
+    ["summary"] = {
+        ["status"] = "complete"
+    },
+    ["embedded_css"] = true,
+    ["smooth_scaling"] = false,
+    ["copt_font_hinting"] = 2,
+    ["copt_line_spacing"] = 100,
+    ["copt_font_size"] = 22,
+    ["highlight_disabled"] = false,
+    ["copt_embedded_css"] = 1,
+    ["copt_h_page_margins"] = {
+        [1] = 20,
+        [2] = 20
+    },
+    ["page_overlap_style"] = "dim",
+    ["copt_view_mode"] = 0,
+    ["css"] = "./data/epub.css",
+    ["gamma_index"] = 15,
+    ["cre_dom_version"] = 20180528,
+    ["nightmode_images"] = true,
+    ["copt_b_page_margin"] = 15,
+    ["bookmarks_sorted"] = true
+}
