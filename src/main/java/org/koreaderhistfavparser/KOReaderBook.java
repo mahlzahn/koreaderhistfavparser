@@ -9,6 +9,9 @@ import java.io.File;
  * The class for a book with properties read from KOReader sdr files.
  */
 public class KOReaderBook {
+    // %t: title, %a: first author, %p: progress in percent, %s: series, %l: language
+    static private String stringFormat = "[%a: ]%t[ (%p%)]";
+
     private String filePath;
     private Boolean finished = false;
     private Double percentFinished;     // progress in range [0, 1]
@@ -22,17 +25,52 @@ public class KOReaderBook {
     private String sdrFilePath;
     private Long sdrFileLastModified = (long) 0;
     private JSONObject sdrJson;
-    // %t: title, %a: first author, %p: progress in percent, %s: series, %l: language
-    static private String stringFormat = "[%a: ]%t[ (%p%)]";
 
     /**
      * Constructs a new KOReaderBook with the specified file path.
      *
-     * @param filePath the file path
+     * @param filePath the book's file path
+     * @throws IllegalArgumentException if given file path is invalid, e.g. without extension
      */
     public KOReaderBook(String filePath) throws IllegalArgumentException {
         this.filePath = filePath;
         sdrFilePath = sdrFilePath(filePath);
+    }
+
+    /**
+     * Returns the string format for the string representation with the format classifiers
+     * <ul>
+     *     <li><code>%t: title</code>,</li>
+     *     <li><code>%a: first author</code>,</li>
+     *     <li><code>%p: progress in percent</code>,</li>
+     *     <li><code>%s: series</code> and </li>
+     *     <li><code>%l: language.</code>
+     * </ul>
+     * Optional classifiers are set by square brackets.
+     * Defaults to <code>[%a: ]%t[ (%p%)]</code>.
+     *
+     * @return the string format
+     */
+    static public String getStringFormat() {
+        return stringFormat;
+    }
+
+    /**
+     * Sets the string format for the string representation of all books with the format classifiers
+     * <ul>
+     *     <li><code>%t: title</code>,</li>
+     *     <li><code>%a: first author</code>,</li>
+     *     <li><code>%p: progress in percent</code>,</li>
+     *     <li><code>%s: series</code> and </li>
+     *     <li><code>%l: language.</code>
+     * </ul>
+     * Optional classifiers are set by square brackets.
+     * Defaults to <code>[%a: ]%t[ (%p%)]</code>.
+     *
+     * @param stringFormat the string format
+     */
+    static public void setStringFormat(String stringFormat) {
+        KOReaderBook.stringFormat = stringFormat;
     }
 
     /**
@@ -121,15 +159,6 @@ public class KOReaderBook {
         output = output.replaceAll("%s", "(no series)");
         output = output.replaceAll("%l", "(no language)");
         return output;
-    }
-
-    private  <T> Boolean propertyOutdated(T property) {
-        Boolean sdrFileModified = sdrFileModified();
-        if (property != null && !sdrFileModified)
-            return false;
-        if (sdrFileModified)
-            return readSdr();
-        return sdrJson != null;  // property == null
     }
 
     /**
@@ -297,41 +326,12 @@ public class KOReaderBook {
     }
 
     /**
-     * Returns the string format for the string representation with the format classifiers
-     * <ul>
-     *     <li><code>%t: title</code>,</li>
-     *     <li><code>%a: first author</code>,</li>
-     *     <li><code>%p: progress in percent</code>,</li>
-     *     <li><code>%s: series</code> and </li>
-     *     <li><code>%l: language.</code>
-     * </ul>
-     * Optional classifiers are set by square brackets.
-     * Defaults to <code>[%a: ]%t[ (%p%)]</code>.
+     * Returns the sdr file path for a given file path.
      *
-     * @return the string format
+     * @param filePath the book's file path
+     * @return the sdr file path
+     * @throws IllegalArgumentException if given file path is invalid, e.g. without extension
      */
-    static public String getStringFormat() {
-        return stringFormat;
-    }
-
-    /**
-     * Sets the string format for the string representation of all books with the format classifiers
-     * <ul>
-     *     <li><code>%t: title</code>,</li>
-     *     <li><code>%a: first author</code>,</li>
-     *     <li><code>%p: progress in percent</code>,</li>
-     *     <li><code>%s: series</code> and </li>
-     *     <li><code>%l: language.</code>
-     * </ul>
-     * Optional classifiers are set by square brackets.
-     * Defaults to <code>[%a: ]%t[ (%p%)]</code>.
-     *
-     * @param stringFormat the string format
-     */
-    static public void setStringFormat(String stringFormat) {
-        KOReaderBook.stringFormat = stringFormat;
-    }
-
     private String sdrFilePath(String filePath) throws IllegalArgumentException {
         try {
             String filePathWithoutExt = filePath.substring(0, filePath.lastIndexOf("."));
