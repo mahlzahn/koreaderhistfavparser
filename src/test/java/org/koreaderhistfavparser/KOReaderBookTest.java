@@ -1,7 +1,5 @@
 package org.koreaderhistfavparser;
 
-import android.util.Log;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -101,13 +99,22 @@ public class KOReaderBookTest {
     @Test
     public void testSetters() {
         KOReaderBook book0 = books[0].koBook;
+        KOReaderBook book2 = books[2].koBook;
         book0.setLastRead((long) 1000);
         assertEquals((long) 1000, (long) book0.getLastRead());
+
         assertFalse(book0.getFinished());
-        //assertTrue(book0.setFinished());
-        //assertTrue(book0.getFinished());
-        //assertTrue(book0.setReading());
-        //assertFalse(book0.getFinished());
+        assertTrue(book0.setFinished());
+        assertTrue(book0.getFinished());
+        assertTrue(book0.setReading());
+        assertFalse(book0.getFinished());
+
+        // no sdr file for book2, will create one
+        assertFalse(book2.getFinished());
+        assertTrue(book2.setFinished());
+        assertTrue(book2.getFinished());
+        assertTrue(book2.setReading());
+        assertFalse(book2.getFinished());
     }
 
     @Test
@@ -134,5 +141,6 @@ public class KOReaderBookTest {
         assertEquals("Karl May (de)", books[0].koBook.toString());
         assertEquals("Max Brod (de)", books[1].koBook.toString());
         assertEquals("(no author)", books[2].koBook.toString());
+        KOReaderBook.setStringFormat(null);
     }
 }

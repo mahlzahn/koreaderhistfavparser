@@ -48,7 +48,7 @@ class KOReaderLuaReadWrite {
                     .replaceAll("^--.*\n", "")
                     .replaceFirst("return ", "")
                     .replaceAll("\\[([0-9]+)\\] =", "\"$1\":")
-                    .replaceAll("\\[(.*)\\] =", "$1:")
+                    .replaceAll("\\[(\"[a-zA-Z_0-9]+\")\\] =", "$1:")
                     .replaceAll("\\\\+\n([^{} ])", ";;;;$1")
             );
         } catch (JSONException e) {
@@ -77,14 +77,14 @@ class KOReaderLuaReadWrite {
                     .replaceAll("\n", "\n    ")
                     .replaceAll("}}", "}\n}");
         content = "return " + content
-                .replaceAll("( +)\"([0-9]+)\":", "$1[$2] =")
-                .replaceAll("( +)\"([a-zA-Z_0-9]+)\":", "$1[\"$2\"] =")
+                .replaceAll("\"([0-9]+)\":", "[$1] =")
+                .replaceAll("\"([a-zA-Z_0-9]+)\":", "[\"$1\"] =")
                 .replaceAll(";;;;", "\\\\\n")
                 .replaceAll("\\\\/", "/")
                 + "\n";
         FileOutputStream fos;
         try {
-            new File(filePath).mkdirs();
+            new File(filePath).getParentFile().mkdirs();
             fos = new FileOutputStream(filePath);
             fos.write(content.getBytes());
             fos.close();

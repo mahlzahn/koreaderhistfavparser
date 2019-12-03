@@ -10,7 +10,8 @@ import java.io.File;
  */
 public class KOReaderBook {
     // %t: title, %a: first author, %p: progress in percent, %s: series, %l: language
-    static private String stringFormat = "[%a: ]%t[ (%p%)]";
+    private static final String STRING_FORMAT_DEFAULT = "[%a: ]%t[ (%p%)]";
+    private static String stringFormat = STRING_FORMAT_DEFAULT;
 
     private String filePath;
     private Boolean finished = false;
@@ -70,7 +71,10 @@ public class KOReaderBook {
      * @param stringFormat the string format
      */
     static public void setStringFormat(String stringFormat) {
-        KOReaderBook.stringFormat = stringFormat;
+        if (stringFormat != null)
+            KOReaderBook.stringFormat = stringFormat;
+        else
+            KOReaderBook.stringFormat = STRING_FORMAT_DEFAULT;
     }
 
     /**
@@ -200,16 +204,23 @@ public class KOReaderBook {
      * @return true if successfully changed finished state, otherwise false
      */
     public Boolean setFinished() {
-        if (finished || sdrJson == null)
+        if (finished)
             return false;
+        if (sdrJson == null)
+            sdrJson = new JSONObject();
+        JSONObject summaryJson;
+        summaryJson = sdrJson.optJSONObject("summary");
+        if (summaryJson == null) {
+            summaryJson = new JSONObject();
+        }
         try {
-            JSONObject summaryJson = sdrJson.getJSONObject("summary");
             summaryJson.put("status", "complete");
-            finished = writeSdr();
-            return finished;
+            sdrJson.put("summary", summaryJson);
         } catch (JSONException e) {
             return false;
         }
+        finished = writeSdr();
+        return finished;
     }
 
     /**
@@ -220,14 +231,14 @@ public class KOReaderBook {
     public Boolean setReading() {
         if (!finished || sdrJson == null)
             return false;
+        JSONObject summaryJson = sdrJson.optJSONObject("summary");
         try {
-            JSONObject summaryJson = sdrJson.getJSONObject("summary");
             summaryJson.put("status", "reading");
-            finished = writeSdr();
-            return finished;
         } catch (JSONException e) {
             return false;
         }
+        finished = !writeSdr();
+        return !finished;
     }
 
     /**
