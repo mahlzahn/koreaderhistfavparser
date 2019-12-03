@@ -79,7 +79,7 @@ public class KOReaderBookTest {
     @Test
     public void testGetters() {
         for (TestBook book : books) {
-            System.out.println("testGetters(): " + book.filePath);
+            System.out.println("testGetters(): Run tests on " + book.filePath);
             assertNotNull(book);
             assertTrue(new File(book.filePath).exists());
             KOReaderBook koBook = book.koBook;
