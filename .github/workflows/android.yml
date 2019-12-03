@@ -16,5 +16,5 @@ jobs:
     - name: Test with Gradle
       run: ./gradlew testDebugUnitTest --info
       continue-on-error: true
-    - name: Android Test Report
-      uses: asadmansr/android-test-report-action@v1.0.0
+#    - name: Android Test Report
+#      uses: asadmansr/android-test-report-action@v1.0.0
