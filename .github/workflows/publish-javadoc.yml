@@ -1,0 +1,29 @@
+name: Publish JavaDoc
+
+on:
+  push:
+    branches: master
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: set up JDK 1.8
+
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+
+    - name: Create JavaDoc documentation
+      run: javadoc -package -notree -nonavbar -noindex -d javadoc-html $(find src/main/java -name *.java) -classpath /usr/local/lib/android/sdk/platforms/android-29/android.jar
+
+    - name: Deploy changes to gh-pages
+      uses: peaceiris/actions-gh-pages@v2.5.0
+      env:
+        ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+        PUBLISH_BRANCH: gh-pages
+        PUBLISH_DIR: ./javadoc-html
+  
