@@ -24,22 +24,28 @@ jobs:
       run: | 
         javadoc -package -notree -nonavbar -noindex -d /tmp/kojavadoc $(find src/main/java -name *.java) -classpath /usr/local/lib/android/sdk/platforms/android-29/android.jar
 
-    - name: Commit JavaDoc files
-      run: |
-        git config --local user.email ""
-        git config --local user.name "JavaDoc Publisher Action"
-        lastCommitShortHash=$(git log --max-count=1 --format=%h)
-        git checkout gh-pages
-        rm -rf docs
-        cp -r /tmp/kojavadoc docs
-        git add docs
-        git commit -m "Update java doc for commit "$lastCommitShortHash
+#    - name: Commit JavaDoc files
+#      run: |
+#        git config --local user.email ""
+#        git config --local user.name "JavaDoc Publisher Action"
+#        lastCommitShortHash=$(git log --max-count=1 --format=%h)
+#        git checkout gh-pages
+#        rm -rf docs
+#        cp -r /tmp/kojavadoc docs
+#        git add docs
+#        git commit -m "Update java doc for commit "$lastCommitShortHash
         
-    - name: Push changes to gh-pages branch
-      uses: ad-m/github-push-action@master
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: gh-pages
-
+#    - name: Push changes to gh-pages branch
+#      uses: ad-m/github-push-action@master
+#      with:
+#        github_token: ${{ secrets.GITHUB_TOKEN }}
+#        branch: gh-pages
+    
+    - name: Deploy changes to gh-pages
+      uses: peaceiris/actions-gh-pages@v2.5.0
+      env:
+        ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+        PUBLISH_BRANCH: gh-pages
+        PUBLISH_DIR: ./docs
 #    - name: Android Test Report
 #      uses: asadmansr/android-test-report-action@v1.0.0
