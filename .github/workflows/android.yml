@@ -21,7 +21,10 @@ jobs:
       continue-on-error: true
 
     - name: Create JavaDoc documentation
-      run: javadoc -package -notree -nonavbar -noindex -d docs $(find src/main/java -name *.java) -classpath /usr/local/lib/android/sdk/platforms/android-29/android.jar
+      run: | 
+        git checkout gh-pages
+        git pull
+        javadoc -package -notree -nonavbar -noindex -d docs $(find src/main/java -name *.java) -classpath /usr/local/lib/android/sdk/platforms/android-29/android.jar
 
     - name: Commit JavaDoc files
       run: |
@@ -30,7 +33,7 @@ jobs:
         git add docs
         git commit -m "Update java doc for commit "$(git log --max-count=1 --format=%h)
         
-    - name: Push changes to gh_pages branch
+    - name: Push changes to gh-pages branch
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
