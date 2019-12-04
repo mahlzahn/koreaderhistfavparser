@@ -9,6 +9,10 @@ import java.io.File;
  * The class for a book with properties read from KOReader sdr files.
  */
 public class KOReaderBook {
+    // %t: title, %a: first author, %p: progress in percent, %s: series, %l: language
+    private static final String STRING_FORMAT_DEFAULT = "[%a: ]%t[ (%p%)]";
+    private static String stringFormat = STRING_FORMAT_DEFAULT;
+
     private String filePath;
     private Boolean finished = false;
     private Double percentFinished;     // progress in range [0, 1]
@@ -22,17 +26,55 @@ public class KOReaderBook {
     private String sdrFilePath;
     private Long sdrFileLastModified = (long) 0;
     private JSONObject sdrJson;
-    // %t: title, %a: first author, %p: progress in percent, %s: series, %l: language
-    private String stringFormat = "[%a: ]%t[ (%p%)]";
 
     /**
      * Constructs a new KOReaderBook with the specified file path.
      *
-     * @param filePath the file path
+     * @param filePath the book's file path
+     * @throws IllegalArgumentException if given file path is invalid, e.g. without extension
      */
     public KOReaderBook(String filePath) throws IllegalArgumentException {
         this.filePath = filePath;
         sdrFilePath = sdrFilePath(filePath);
+    }
+
+    /**
+     * Returns the string format for the string representation with the format classifiers
+     * <ul>
+     *     <li><code>%t: title</code>,</li>
+     *     <li><code>%a: first author</code>,</li>
+     *     <li><code>%p: progress in percent</code>,</li>
+     *     <li><code>%s: series</code> and </li>
+     *     <li><code>%l: language.</code>
+     * </ul>
+     * Optional classifiers are set by square brackets.
+     * Defaults to <code>[%a: ]%t[ (%p%)]</code>.
+     *
+     * @return the string format
+     */
+    static public String getStringFormat() {
+        return stringFormat;
+    }
+
+    /**
+     * Sets the string format for the string representation of all books with the format classifiers
+     * <ul>
+     *     <li><code>%t: title</code>,</li>
+     *     <li><code>%a: first author</code>,</li>
+     *     <li><code>%p: progress in percent</code>,</li>
+     *     <li><code>%s: series</code> and </li>
+     *     <li><code>%l: language.</code>
+     * </ul>
+     * Optional classifiers are set by square brackets.
+     * Defaults to <code>[%a: ]%t[ (%p%)]</code>.
+     *
+     * @param stringFormat the string format
+     */
+    static public void setStringFormat(String stringFormat) {
+        if (stringFormat != null)
+            KOReaderBook.stringFormat = stringFormat;
+        else
+            KOReaderBook.stringFormat = STRING_FORMAT_DEFAULT;
     }
 
     /**
@@ -51,6 +93,11 @@ public class KOReaderBook {
         return filePath.equals(book.filePath);
     }
 
+    /**
+     * Returns the hash code of the book's file path string.
+     *
+     * @return hash code
+     */
     @Override
     public int hashCode() {
         return filePath.hashCode();
@@ -77,7 +124,7 @@ public class KOReaderBook {
         String output = stringFormat;
         if (output.contains("%t")) {
             getTitle();
-            if (title != null)
+            if (title != null && !title.equals(""))
                 output = output.replace("%t", title);
         }
         if (output.contains("%a")) {
@@ -92,12 +139,12 @@ public class KOReaderBook {
         }
         if (output.contains("%s")) {
             getSeries();
-            if (series != null)
+            if (series != null && !series.equals(""))
                 output = output.replace("%s", series);
         }
         if (output.contains("%l")) {
             getLanguage();
-            if (language != null)
+            if (language != null && !language.equals(""))
                 output = output.replace("%l", language);
         }
         String r1 = "\\[[^\\[\\]]*%[tapsl][^\\[\\]]*\\]";   // matches e.g. [%a: ], [ (%p%)]
@@ -118,15 +165,6 @@ public class KOReaderBook {
         return output;
     }
 
-    private  <T> Boolean propertyOutdated(T property) {
-        Boolean sdrFileModified = sdrFileModified();
-        if (property != null && !sdrFileModified)
-            return false;
-        if (sdrFileModified)
-            readSdr();
-        return true;
-    }
-
     /**
      * Returns the file path.
      *
@@ -142,11 +180,8 @@ public class KOReaderBook {
      * @return true if book is finished, otherwise false
      */
     public Boolean getFinished() {
-        if (propertyOutdated(finished))
-            try {
-                String finishedString = sdrJson.getJSONObject("summary").getString("status");
-                finished = (finishedString.equals("complete"));
-            } catch (JSONException e) {}
+        if (sdrFileModified())
+            readSdr();
         return finished;
     }
 
@@ -169,16 +204,23 @@ public class KOReaderBook {
      * @return true if successfully changed finished state, otherwise false
      */
     public Boolean setFinished() {
-        if (finished || sdrJson == null)
+        if (finished)
             return false;
+        if (sdrJson == null)
+            sdrJson = new JSONObject();
+        JSONObject summaryJson;
+        summaryJson = sdrJson.optJSONObject("summary");
+        if (summaryJson == null) {
+            summaryJson = new JSONObject();
+        }
         try {
-            JSONObject summaryJson = sdrJson.getJSONObject("summary");
             summaryJson.put("status", "complete");
-            finished = writeSdr();
-            return finished;
+            sdrJson.put("summary", summaryJson);
         } catch (JSONException e) {
             return false;
         }
+        finished = writeSdr();
+        return finished;
     }
 
     /**
@@ -189,14 +231,14 @@ public class KOReaderBook {
     public Boolean setReading() {
         if (!finished || sdrJson == null)
             return false;
+        JSONObject summaryJson = sdrJson.optJSONObject("summary");
         try {
-            JSONObject summaryJson = sdrJson.getJSONObject("summary");
             summaryJson.put("status", "reading");
-            finished = writeSdr();
-            return finished;
         } catch (JSONException e) {
             return false;
         }
+        finished = !writeSdr();
+        return !finished;
     }
 
     /**
@@ -205,10 +247,8 @@ public class KOReaderBook {
      * @return the percent finished; null if not extractable from sdr file
      */
     public Double getPercentFinished() {
-        if (propertyOutdated(percentFinished))
-            try {
-                percentFinished = sdrJson.getDouble("percent_finished");
-            } catch (JSONException e) {}
+        if (sdrFileModified())
+            readSdr();
         return percentFinished;
     }
 
@@ -236,10 +276,8 @@ public class KOReaderBook {
      * @return the number of pages; null if not extractable from sdr file
      */
     public Integer getPages() {
-        if (propertyOutdated(pages))
-            try {
-                pages = sdrJson.getJSONObject("stats").getInt("pages");
-            } catch (JSONException e) {}
+        if (sdrFileModified())
+            readSdr();
         return pages;
     }
 
@@ -249,10 +287,8 @@ public class KOReaderBook {
      * @return the title; null if not extractable from sdr file
      */
     public String getTitle() {
-        if (propertyOutdated(title))
-            try {
-                title = sdrJson.getJSONObject("stats").getString("title");
-            } catch (JSONException e) {}
+        if (sdrFileModified())
+            readSdr();
         return title;
     }
 
@@ -262,11 +298,8 @@ public class KOReaderBook {
      * @return the array of authors; null if not extractable from sdr file
      */
     public String[] getAuthors() {
-        if (propertyOutdated(authors))
-            try {
-                String authorsString = sdrJson.getJSONObject("stats").getString("authors");
-                authors = authorsString.split(";;;;");
-            } catch (JSONException e) {}
+        if (sdrFileModified())
+            readSdr();
         return authors;
     }
 
@@ -276,11 +309,8 @@ public class KOReaderBook {
      * @return the array of keywords; null if not extractable from sdr file
      */
     public String[] getKeywords() {
-        if (propertyOutdated(keywords))
-            try {
-                String keywordsString = sdrJson.getJSONObject("stats").getString("keywords");
-                keywords = keywordsString.split(";;;;");
-            } catch (JSONException e) {}
+        if (sdrFileModified())
+            readSdr();
         return keywords;
     }
 
@@ -290,10 +320,8 @@ public class KOReaderBook {
      * @return the language; null if not extractable from sdr file
      */
     public String getLanguage() {
-        if (propertyOutdated(keywords))
-            try {
-                language = sdrJson.getJSONObject("stats").getString("language");
-            } catch (JSONException e) {}
+        if (sdrFileModified())
+            readSdr();
         return language;
     }
 
@@ -303,49 +331,18 @@ public class KOReaderBook {
      * @return the series; null if not extractable from sdr file
      */
     public String getSeries() {
-        if (propertyOutdated(series))
-            try {
-                series = sdrJson.getJSONObject("stats").getString("series");
-            } catch (JSONException e) {}
+        if (sdrFileModified())
+            readSdr();
         return series;
     }
 
     /**
-     * Returns the string format for the string representation with the format classifiers
-     * <ul>
-     *     <li><code>%t: title</code>,</li>
-     *     <li><code>%a: first author</code>,</li>
-     *     <li><code>%p: progress in percent</code>,</li>
-     *     <li><code>%s: series</code> and </li>
-     *     <li><code>%l: language.</code>
-     * </ul>
-     * Optional classifiers are set by square brackets.
-     * Defaults to <code>[%a: ]%t[ (%p%)]</code>.
+     * Returns the sdr file path for a given file path.
      *
-     * @return the string format
+     * @param filePath the book's file path
+     * @return the sdr file path
+     * @throws IllegalArgumentException if given file path is invalid, e.g. without extension
      */
-    public String getStringFormat() {
-        return stringFormat;
-    }
-
-    /**
-     * Sets the string format for the string representation with the format classifiers
-     * <ul>
-     *     <li><code>%t: title</code>,</li>
-     *     <li><code>%a: first author</code>,</li>
-     *     <li><code>%p: progress in percent</code>,</li>
-     *     <li><code>%s: series</code> and </li>
-     *     <li><code>%l: language.</code>
-     * </ul>
-     * Optional classifiers are set by square brackets.
-     * Defaults to <code>[%a: ]%t[ (%p%)]</code>.
-     *
-     * @param stringFormat the string format
-     */
-    public void setStringFormat(String stringFormat) {
-        this.stringFormat = stringFormat;
-    }
-
     private String sdrFilePath(String filePath) throws IllegalArgumentException {
         try {
             String filePathWithoutExt = filePath.substring(0, filePath.lastIndexOf("."));
@@ -374,6 +371,39 @@ public class KOReaderBook {
     private Boolean readSdr() {
         sdrFileLastModified = new File(sdrFilePath).lastModified();
         sdrJson = KOReaderLuaReadWrite.readLuaFile(sdrFilePath);
+        if (sdrJson != null) {
+            JSONObject docPropsJson;
+            try {
+                String finishedString = sdrJson.getJSONObject("summary").getString("status");
+                finished = (finishedString.equals("complete"));
+            } catch (JSONException e) {}
+            try {
+                docPropsJson = sdrJson.getJSONObject("doc_props");
+                try {
+                    String authorsString = docPropsJson.getString("authors");
+                    authors = authorsString.split(";;;;");
+                } catch (JSONException e) {}
+                try {
+                    String keywordsString = docPropsJson.getString("keywords");
+                    keywords = keywordsString.split(";;;;");
+                } catch (JSONException e) {}
+                try {
+                    language = docPropsJson.getString("language");
+                } catch (JSONException e) {}
+                try {
+                    series = docPropsJson.getString("series");
+                } catch (JSONException e) {}
+                try {
+                    title = docPropsJson.getString("title");
+                } catch (JSONException e) {}
+            } catch (JSONException e) {}
+            try {
+                pages = sdrJson.getJSONObject("stats").getInt("pages");
+            } catch (JSONException e) {}
+            try {
+                percentFinished = sdrJson.getDouble("percent_finished");
+            } catch (JSONException e) {}
+        }
         return (sdrJson != null);
     }
 

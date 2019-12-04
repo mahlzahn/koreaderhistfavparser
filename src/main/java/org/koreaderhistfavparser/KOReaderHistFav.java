@@ -2,7 +2,6 @@ package org.koreaderhistfavparser;
 
 import android.os.Environment;
 import android.util.Log;
-import android.util.SparseArray;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,10 +20,9 @@ import java.util.Iterator;
 public class KOReaderHistFav {
     private final static String TAG = "KOReaderHistFav";
 
-    // Returned as part of KOReaderBook.getFilePath
-    private final static String EXTERNAL_STORAGE_PATH = "/mnt/sdcard";
-    // automatically detected external storage path, defaults to "/storage/emulated/0"
-    private String externalStoragePath;
+    // automatically detected external storage path during construction
+    private static String externalStoragePath;
+    private final static String EXTERNAL_STORAGE_PATH_DEFAULT = "/storage/emulated/0";
 
     // something like "/storage/emulated/0/koreader"
     private String koreaderDirectoryPath;
@@ -58,22 +56,41 @@ public class KOReaderHistFav {
      * @throws FileNotFoundException if KOReader settings directory not found
      */
     public KOReaderHistFav(String koreaderDirectoryPath) throws FileNotFoundException {
-        try {
-            externalStoragePath = Environment.getExternalStorageDirectory().getCanonicalPath();
-        } catch (IOException e) {
-            externalStoragePath = "/storage/emulated/0";
-        }
-
         this.koreaderDirectoryPath = koreaderDirectoryPath(koreaderDirectoryPath);
         historyFilePath = this.koreaderDirectoryPath + "/" + HISTORY_FILE_PATH;
         collectionFilePath = this.koreaderDirectoryPath + "/" + COLLECTION_FILE_PATH;
         Log.d(TAG, "Set up with history file " + historyFilePath
                 + " and with collection file " + collectionFilePath);
+    }
 
-        if (readHistory())
-            readBooksFromHistory();
-        if (readFavorites())
-            readBooksFromFavorites();
+    /**
+     * Returns the external storage path for books. Defaults to "/mnt/sdcard".
+     *
+     * @return the external storage path
+     */
+    public static String getExternalStoragePath() {
+        if (externalStoragePath == null)
+            try {
+                externalStoragePath = Environment.getExternalStorageDirectory().getCanonicalPath();
+            } catch (IOException | NullPointerException e) {
+                externalStoragePath = EXTERNAL_STORAGE_PATH_DEFAULT;
+            }
+        return externalStoragePath;
+    }
+
+    /**
+     * Sets the external storage path for books.
+     *
+     * @param externalStoragePath the external storage path
+     * @throws FileNotFoundException if the given file path does not point to valid directory
+     */
+    public static void setExternalStoragePath(String externalStoragePath)
+            throws FileNotFoundException {
+        if (new File(externalStoragePath).isDirectory())
+            KOReaderHistFav.externalStoragePath = externalStoragePath;
+        else
+            throw new FileNotFoundException("Could not locate external storage directory "
+                    + externalStoragePath);
     }
 
     /**
@@ -104,52 +121,46 @@ public class KOReaderHistFav {
     }
 
     /**
-     * Returns the library with all books from favorites and history import.
-     *
-     * @return the library
-     */
-    public HashMap<String, KOReaderBook> getLibrary() {
-        if (historyFileModified() && readHistory())
-            readBooksFromHistory();
-        if (collectionFileModified() && readFavorites())
-            readBooksFromFavorites();
-        return books;
-    }
-
-    /**
-     * Returns the book for given file path.
+     * Add book to favorites (and library). If book already in favorites, move book to first
+     * position.
      *
      * @param filePath the book file path
-     * @return the book
+     * @return true if successfully, otherwise false
      */
-    public KOReaderBook getBook(String filePath) {
-        if (historyFileModified() && readHistory())
-            readBooksFromHistory();
-        if (collectionFileModified() && readFavorites())
-            readBooksFromFavorites();
-        return books.get(uniqueFilePath(filePath));
+    public Boolean addBookToFavorites(String filePath) {
+        readFavorites();
+        filePath = uniqueFilePath(filePath);
+        KOReaderBook book = books.get(filePath);
+        if (book == null) {
+            book = new KOReaderBook(filePath);
+            books.put(filePath, book);
+        }
+        if (favorites.contains(book))
+            favorites.remove(book);
+        favorites.add(0, book);
+        return writeFavorites();
     }
 
     /**
-     * Returns the list of books in history, sorted by last reading (last read book first).
+     * Add book to history (and library). If book already in history, move book to first position.
+     * Sets book's last reading time to current time.
      *
-     * @return the history
+     * @param filePath the book file path
+     * @return true if successfully, otherwise false
      */
-    public ArrayList<KOReaderBook> getHistory() {
-        if (historyFileModified() && readHistory())
-            readBooksFromHistory();
-        return history;
-    }
-
-    /**
-     * Returns the list of books in favorites, sorted by last added (last added book first).
-     *
-     * @return the favorites
-     */
-    public ArrayList<KOReaderBook> getFavorites() {
-        if (collectionFileModified() && readFavorites())
-            readBooksFromFavorites();
-        return favorites;
+    public Boolean addBookToHistory(String filePath) {
+        readHistory();
+        filePath = uniqueFilePath(filePath);
+        KOReaderBook book = books.get(filePath);
+        if (book == null) {
+            book = new KOReaderBook(filePath);
+            books.put(filePath, book);
+        }
+        if (history.contains(book))
+            history.remove(book);
+        book.setLastRead(new Date().getTime());
+        history.add(0, book);
+        return writeHistory();
     }
 
     /**
@@ -159,6 +170,8 @@ public class KOReaderHistFav {
      * @return true if successfully, otherwise false
      */
     public Boolean addBookToLibrary(String filePath) {
+        readHistory();
+        readFavorites();
         filePath = uniqueFilePath(filePath);
         KOReaderBook book = books.get(filePath);
         if (book == null) {
@@ -172,12 +185,89 @@ public class KOReaderHistFav {
     }
 
     /**
+     * Returns the book for given file path.
+     *
+     * @param filePath the book's file path
+     * @return the book or null if book is not in library
+     */
+    public KOReaderBook getBook(String filePath) {
+        readHistory();
+        readFavorites();
+        return books.get(uniqueFilePath(filePath));
+    }
+
+    /**
+     * Returns the list of books in favorites, sorted by last added (last added book first).
+     *
+     * @return the favorites
+     */
+    public ArrayList<KOReaderBook> getFavorites() {
+        readFavorites();
+        return favorites;
+    }
+
+    /**
+     * Returns the list of books in history, sorted by last reading (last read book first).
+     *
+     * @return the history
+     */
+    public ArrayList<KOReaderBook> getHistory() {
+        readHistory();
+        return history;
+    }
+
+    /**
+     * Returns the library with all books from favorites and history import.
+     *
+     * @return the library
+     */
+    public HashMap<String, KOReaderBook> getLibrary() {
+        readHistory();
+        readFavorites();
+        return books;
+    }
+
+    /**
+     * Remove book from favorites.
+     *
+     * @param filePath the book file path
+     * @return true if successfully, otherwise false
+     */
+    public Boolean removeBookFromFavorites(String filePath) {
+        readFavorites();
+        filePath = uniqueFilePath(filePath);
+        KOReaderBook book = books.get(filePath);
+        if (book != null && favorites.remove(book))
+            return writeFavorites();
+        else
+            return false;
+    }
+
+    /**
+     * Remove book from history.
+     *
+     * @param filePath the book file path
+     * @return true if successfully, otherwise false
+     */
+    public Boolean removeBookFromHistory(String filePath) {
+        readHistory();
+        filePath = uniqueFilePath(filePath);
+        KOReaderBook book = books.get(filePath);
+        if (book != null && history.remove(book))
+            return writeHistory();
+        else
+            return false;
+    }
+
+    /**
      * Remove book from library (and favorites and history).
      *
      * @param filePath the book file path
      * @return true if successfully, otherwise false
      */
     public Boolean removeBookFromLibrary(String filePath) {
+        readHistory();
+        readFavorites();
         filePath = uniqueFilePath(filePath);
         KOReaderBook book = books.get(filePath);
         if (book != null) {
@@ -198,74 +288,24 @@ public class KOReaderHistFav {
     }
 
     /**
-     * Add book to history (and library). If book already in history, move book to first position.
-     * Sets book's last reading time to current time.
+     * Return a unique file path string for the given file path using canonical path and unification
+     * by external storage path (necessary for some devices, see
+     * <a href=https://stackoverflow.com/questions/15841380/android-disambiguating-file-paths>
+     *     Android disambiguating file path</a>.
+     * The external storage path can be set by {@link #setExternalStoragePath} and is returned by
+     * {@link #getExternalStoragePath}. It defaults to <code>/storage/emulated/0</code>.
      *
-     * @param filePath the book file path
-     * @return true if successfully, otherwise false
+     * @param filePath the file path
+     * @return the unique file path
      */
-    public Boolean addBookToHistory(String filePath) {
-        filePath = uniqueFilePath(filePath);
-        KOReaderBook book = books.get(filePath);
-        if (book == null) {
-            book = new KOReaderBook(filePath);
-            books.put(filePath, book);
-        }
-        if (history.contains(book))
-            history.remove(book);
-        book.setLastRead(new Date().getTime());
-        history.add(0, book);
-        return writeHistory();
-    }
-
-    /**
-     * Remove book from history.
-     *
-     * @param filePath the book file path
-     * @return true if successfully, otherwise false
-     */
-    public Boolean removeBookFromHistory(String filePath) {
-        filePath = uniqueFilePath(filePath);
-        KOReaderBook book = books.get(filePath);
-        if (book != null && history.remove(book))
-            return writeHistory();
-        else
-            return false;
-    }
-
-    /**
-     * Add book to favorites (and library). If book already in favorites, move book to first
-     * position.
-     *
-     * @param filePath the book file path
-     * @return true if successfully, otherwise false
-     */
-    public Boolean addBookToFavorites(String filePath) {
-        filePath = uniqueFilePath(filePath);
-        KOReaderBook book = books.get(filePath);
-        if (book == null) {
-            book = new KOReaderBook(filePath);
-            books.put(filePath, book);
-        }
-        if (favorites.contains(book))
-            favorites.remove(book);
-        favorites.add(0, book);
-        return writeFavorites();
-    }
-
-    /**
-     * Remove book from favorites.
-     *
-     * @param filePath the book file path
-     * @return true if successfully, otherwise false
-     */
-    public Boolean removeBookFromFavorites(String filePath) {
-        filePath = uniqueFilePath(filePath);
-        KOReaderBook book = books.get(filePath);
-        if (book != null && favorites.remove(book))
-            return writeFavorites();
-        else
-            return false;
+    static String uniqueFilePath(String filePath) {
+        try {
+            filePath = new File(filePath).getCanonicalPath();
+        } catch (IOException e) {}
+        // E.g. on device Onyx MC_DARWIN6 the canonical paths of "/storage/emulated/0" and
+        // "/storage/emulated/legacy" are not identical, although pointing to same directory.
+        String replaceRegexExtStorage = "^/storage/emulated/(legacy|0)|(/mnt|)/sdcard";
+        return filePath.replaceFirst(replaceRegexExtStorage, getExternalStoragePath());
     }
 
     private String koreaderDirectoryPath(String koreaderDirectoryPath)
@@ -276,25 +316,13 @@ public class KOReaderHistFav {
             throw new FileNotFoundException("Could not locate given koreader directory "
                     + koreaderDirectoryPath);
         } else {
-            String[] paths = {externalStoragePath, "/mnt/external_sd", "/mnt/extSdCard"};
+            String[] paths = {getExternalStoragePath(), "/mnt/external_sd", "/mnt/extSdCard"};
             for (String path : paths) {
                 if (new File(path + "/koreader").exists())
                     return path + "/koreader";
             }
             throw new FileNotFoundException("Could not locate koreader directory.");
         }
-    }
-
-    private String uniqueFilePath(String filePath) {
-        try {
-            filePath = new File(filePath).getCanonicalPath();
-        } catch (IOException e) {}
-        // E.g. on device Onyx MC_DARWIN6 the canonical paths of "/storage/emulated/0" and
-        // "/storage/emulated/legacy" are not identical, although pointing to same directory.
-        // See https://stackoverflow.com/questions/15841380/android-disambiguating-file-paths
-        String replaceRegexExtStorage = "^" + externalStoragePath
-                + "|/storage/emulated/legacy|/storage/emulated/0|/sdcard";
-        return filePath.replaceFirst(replaceRegexExtStorage, EXTERNAL_STORAGE_PATH);
     }
 
     private Boolean historyFileModified() {
@@ -305,13 +333,9 @@ public class KOReaderHistFav {
         if (historyFileModified()) {
             historyJson = KOReaderLuaReadWrite.readLuaFile(historyFilePath);
             historyLastModified = new File(historyFilePath).lastModified();
-            return (historyJson != null);
         } else {
             return false;
         }
-    }
-
-    private Boolean readBooksFromHistory() {
         if (historyJson == null)
             return false;
         history.clear();
@@ -365,7 +389,7 @@ public class KOReaderHistFav {
                 JSONObject keyjson = new JSONObject();
                 keyjson.put("file", history.get(key).getFilePath());
                 keyjson.put("time", history.get(key).getLastRead());
-                historyJson.put(String.valueOf(key), keyjson);
+                historyJson.put(String.valueOf(key + 1), keyjson);
             }
         } catch (JSONException e) {
             return false;
@@ -381,20 +405,17 @@ public class KOReaderHistFav {
         if (collectionFileModified()) {
             collectionJson = KOReaderLuaReadWrite.readLuaFile(collectionFilePath);
             collectionLastModified = new File(collectionFilePath).lastModified();
-            return (collectionJson != null);
         } else {
             return false;
         }
-    }
-
-    private Boolean readBooksFromFavorites() {
         if (collectionJson == null)
             return false;
         JSONObject favoritesJson = collectionJson.optJSONObject("favorites");
         if (favoritesJson == null)
             return false;
         favorites.clear();
-        SparseArray<KOReaderBook> booksArray = new SparseArray<>();
+        ArrayList<Integer> favoritesOrder = new ArrayList<>();
+        //SparseArray<KOReaderBook> booksArray = new SparseArray<>();
         Iterator keys = favoritesJson.keys();
         while (keys.hasNext()) {
             String key = (String) keys.next();
@@ -417,13 +438,24 @@ public class KOReaderHistFav {
                 book = new KOReaderBook(filePath);
                 books.put(filePath, book);
             }
-            if (booksArray.get(order) == null)
-                booksArray.append(order, book);
-            else
-                booksArray.append(booksArray.keyAt(booksArray.size() - 1) + 100, book);
+            int favoritesSize = favorites.size();
+            if (favoritesSize == 0) {
+                favorites.add(book);
+                favoritesOrder.add(order);
+            } else {
+                for (int i = 0; i < favoritesSize; i++) {
+                    if (order < favoritesOrder.get(i)) {
+                        favorites.add(i, book);
+                        favoritesOrder.add(i, order);
+                        break;
+                    } else if (i == favoritesSize - 1) {
+                        favorites.add(book);
+                        favoritesOrder.add(order);
+                        break;
+                    }
+                }
+            }
         }
-        for (int i = 0; i < booksArray.size(); i++)
-            favorites.add(booksArray.valueAt(i));
         Log.d(TAG, "--- readBooksFromFavorites() successfully. Added "
                 + favorites.size() + " books.");
         return true;
@@ -435,8 +467,8 @@ public class KOReaderHistFav {
             for (int key = 0; key < favorites.size(); key++) {
                 JSONObject keyjson = new JSONObject();
                 keyjson.put("file", favorites.get(key).getFilePath());
-                keyjson.put("order", key);
-                favoritesJson.put(String.valueOf(key), keyjson);
+                keyjson.put("order", key + 1);
+                favoritesJson.put(String.valueOf(key + 1), keyjson);
             }
             collectionJson.put("favorites", favoritesJson);
         } catch (JSONException e) {
