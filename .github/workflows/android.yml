@@ -34,7 +34,7 @@ jobs:
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: gh_pages
+        branch: gh-pages
 
 #    - name: Android Test Report
 #      uses: asadmansr/android-test-report-action@v1.0.0
