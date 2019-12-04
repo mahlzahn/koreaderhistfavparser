@@ -1,21 +1,24 @@
 package org.koreaderhistfavparser;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
 
 import static org.junit.Assert.*;
 
 /**
- * Example local unit test, which will execute on the development machine (host).
- *
- * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
+ * Test class for KOReaderBook class.
  */
 public class KOReaderBookTest {
+    private final String resSrcDir = "src/test/res";
+    private final String resBuildDir = "build/test-res";
+    private final String booksDir = resBuildDir + "/books";
+
     private TestBook[] books = new TestBook[3];
-    private String[][] authors = new String[3][];
-    private String[] title = new String[3];
+
     class TestBook {
         private KOReaderBook koBook;
         private String[] authors;
@@ -44,10 +47,11 @@ public class KOReaderBookTest {
     }
 
     @Before
-    public void setUp() {
-        books[0] = new TestBook(new KOReaderBook("src/test/res/books/book1.epub"),
+    public void setUp() throws IOException {
+        FileUtils.copyDirectory(new File(resSrcDir), new File(resBuildDir));
+        books[0] = new TestBook(new KOReaderBook(booksDir + "/book1.epub"),
                 new String[] {"Karl May"},
-                "src/test/res/books/book1.epub",
+                booksDir + "/book1.epub",
                 "Durch Wüste und Harem / Gesammelte Reiseromane, Band I",
                 new String[] {"Adventure stories", "Middle East -- Fiction", "German fiction"},
                 "de",
@@ -55,9 +59,9 @@ public class KOReaderBookTest {
                 0.0017699115044248,
                 1130,
                 false);
-        books[1] = new TestBook(new KOReaderBook("src/test/res/books/book2.epub"),
+        books[1] = new TestBook(new KOReaderBook(booksDir + "/book2.epub"),
                 new String[] {"Max Brod", "Franz Kafka"},
-                "src/test/res/books/book2.epub",
+                booksDir + "/book2.epub",
                 "Erstes Kapitel des Buches \"Richard und Samuel\" / Die erste lange" +
                         " Eisenbahnfahrt (Prag-Zürich)",
                 new String[] {"Young men -- Fiction", "Male friendship -- Fiction",
@@ -67,9 +71,9 @@ public class KOReaderBookTest {
                 0.017543859649123,
                 57,
                 true);
-        books[2] = new TestBook(new KOReaderBook("src/test/res/books/book3.epub"), // no sdr file
+        books[2] = new TestBook(new KOReaderBook(booksDir + "/book3.epub"), // no sdr file
                 null,
-                "src/test/res/books/book3.epub",
+                booksDir + "/book3.epub",
                 null, null, null, null,
                 null, null, false);
     }
@@ -91,7 +95,7 @@ public class KOReaderBookTest {
             assertEquals(book.pages, koBook.getPages());
             assertEquals(book.percentFinished, koBook.getPercentFinished());
             assertEquals(book.series, koBook.getSeries());
-            assertEquals("[%a: ]%t[ (%p%)]", koBook.getStringFormat());
+            assertEquals("[%a: ]%t[ (%p%)]", KOReaderBook.getStringFormat());
             assertEquals(book.title, koBook.getTitle());
         }
     }

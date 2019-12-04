@@ -1,24 +1,34 @@
 package org.koreaderhistfavparser;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import static org.junit.Assert.*;
 
+/**
+ * Test class for KOReaderHistFav class.
+ */
 public class KOReaderHistFavTest {
+    private final String resSrcDir = "src/test/res";
+    private final String resBuildDir = "build/test-res";
+    private final String booksDir = resBuildDir + "/books";
+    private final String koreaderDir = resBuildDir + "/koreader";
+
     private KOReaderHistFav histFav;
     private KOReaderBook[] books = new KOReaderBook[3];
-    private final String bookDir = "src/test/res/books";
-    private final String koreaderDir = "src/test/res/koreader";
 
     @Before
-    public void setUp() throws FileNotFoundException {
+    public void setUp() throws IOException {
+        FileUtils.copyDirectory(new File(resSrcDir), new File(resBuildDir));
         histFav = new KOReaderHistFav(koreaderDir);
-        books[0] = new KOReaderBook(KOReaderHistFav.uniqueFilePath(bookDir + "/book1.epub"));
-        books[1] = new KOReaderBook(KOReaderHistFav.uniqueFilePath(bookDir + "/book2.epub"));
-        books[2] = new KOReaderBook(KOReaderHistFav.uniqueFilePath(bookDir + "/book3.epub"));
+        books[0] = new KOReaderBook(KOReaderHistFav.uniqueFilePath(booksDir + "/book1.epub"));
+        books[1] = new KOReaderBook(KOReaderHistFav.uniqueFilePath(booksDir + "/book2.epub"));
+        books[2] = new KOReaderBook(KOReaderHistFav.uniqueFilePath(booksDir + "/book3.epub"));
     }
 
     @Test
@@ -28,7 +38,7 @@ public class KOReaderHistFavTest {
         assertEquals(koreaderDir + "/settings/collection.lua",
                 histFav.getKoreaderCollectionFilePath());
         assertEquals(books[0].getFilePath(),
-                histFav.getBook(bookDir + "/book1.epub").getFilePath());
+                histFav.getBook(booksDir + "/book1.epub").getFilePath());
         assertEquals(2, histFav.getFavorites().size());
         assertEquals(books[0], histFav.getFavorites().get(0));
         assertEquals(books[2], histFav.getFavorites().get(1));
@@ -51,8 +61,8 @@ public class KOReaderHistFavTest {
     @Test
     public void testExternalStoragePath() throws FileNotFoundException {
         assertEquals("/storage/emulated/0", KOReaderHistFav.getExternalStoragePath());
-        KOReaderHistFav.setExternalStoragePath("src/test/res/books");
-        assertEquals("src/test/res/books", KOReaderHistFav.getExternalStoragePath());
+        KOReaderHistFav.setExternalStoragePath(booksDir);
+        assertEquals(booksDir, KOReaderHistFav.getExternalStoragePath());
     }
 
     @Test
@@ -68,6 +78,8 @@ public class KOReaderHistFavTest {
         assertEquals(1, histFav.getFavorites().size());
         assertTrue(histFav.addBookToFavorites(books[0].getFilePath()));
         assertEquals(2, histFav.getFavorites().size());
+        assertEquals(books[0], histFav.getFavorites().get(0));
+        assertEquals(books[2], histFav.getFavorites().get(1));
         
         assertTrue(histFav.removeBookFromHistory(books[0].getFilePath()));
         assertEquals(1, histFav.getHistory().size());
@@ -79,6 +91,8 @@ public class KOReaderHistFavTest {
         assertEquals(1, histFav.getHistory().size());
         assertTrue(histFav.addBookToHistory(books[0].getFilePath()));
         assertEquals(2, histFav.getHistory().size());
+        assertEquals(books[0], histFav.getHistory().get(0));
+        assertEquals(books[1], histFav.getHistory().get(1));
 
         assertTrue(histFav.removeBookFromLibrary(books[0].getFilePath()));
         assertEquals(2, histFav.getLibrary().size());
@@ -90,13 +104,6 @@ public class KOReaderHistFavTest {
         assertEquals(1, histFav.getLibrary().size());
         assertEquals(0, histFav.getFavorites().size());
         assertEquals(0, histFav.getHistory().size());
-
-        // restore original order for favorites and history
-        assertTrue(histFav.addBookToFavorites(books[2].getFilePath()));
-        assertTrue(histFav.addBookToFavorites(books[0].getFilePath()));
-        assertEquals(2, histFav.getFavorites().size());
-        assertTrue(histFav.addBookToHistory(books[1].getFilePath()));
-        assertTrue(histFav.addBookToHistory(books[0].getFilePath()));
-        assertEquals(2, histFav.getHistory().size());
+        assertFalse(histFav.addBookToLibrary(books[0].getFilePath()));
     }
 }
