@@ -1,34 +1,28 @@
 package org.koreaderhistfavparser;
 
-import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import static org.junit.Assert.*;
+import static org.testng.Assert.*;
 
 /**
  * Test class for KOReaderHistFav class.
  */
-public class KOReaderHistFavTest {
-    private final String resSrcDir = "src/test/res";
-    private final String resBuildDir = "build/test-res";
-    private final String booksDir = resBuildDir + "/books";
+public class KOReaderHistFavTest extends KOReaderCommonTest {
     private final String koreaderDir = resBuildDir + "/koreader";
 
     private KOReaderHistFav histFav;
-    private KOReaderBook[] books = new KOReaderBook[3];
+    private KOReaderBook[] koBooks = new KOReaderBook[3];
 
-    @Before
+    @BeforeMethod
     public void setUp() throws IOException {
-        FileUtils.copyDirectory(new File(resSrcDir), new File(resBuildDir));
+        super.setUp();
         histFav = new KOReaderHistFav(koreaderDir);
-        books[0] = new KOReaderBook(KOReaderHistFav.uniqueFilePath(booksDir + "/book1.epub"));
-        books[1] = new KOReaderBook(KOReaderHistFav.uniqueFilePath(booksDir + "/book2.epub"));
-        books[2] = new KOReaderBook(KOReaderHistFav.uniqueFilePath(booksDir + "/book3.epub"));
+        for (int i = 0; i < 3; i++)
+            koBooks[i] = books[i].koBook;
     }
 
     @Test
@@ -37,18 +31,18 @@ public class KOReaderHistFavTest {
         assertEquals(koreaderDir + "/history.lua", histFav.getKoreaderHistoryFilePath());
         assertEquals(koreaderDir + "/settings/collection.lua",
                 histFav.getKoreaderCollectionFilePath());
-        assertEquals(books[0].getFilePath(),
+        assertEquals(koBooks[0].getFilePath(),
                 histFav.getBook(booksDir + "/book1.epub").getFilePath());
         assertEquals(2, histFav.getFavorites().size());
-        assertEquals(books[0], histFav.getFavorites().get(0));
-        assertEquals(books[2], histFav.getFavorites().get(1));
+        assertEquals(koBooks[0], histFav.getFavorites().get(0));
+        assertEquals(koBooks[2], histFav.getFavorites().get(1));
         assertEquals(2, histFav.getHistory().size());
-        assertEquals(books[0], histFav.getHistory().get(0));
-        assertEquals(books[1], histFav.getHistory().get(1));
+        assertEquals(koBooks[0], histFav.getHistory().get(0));
+        assertEquals(koBooks[1], histFav.getHistory().get(1));
         assertEquals(3, histFav.getLibrary().size());
-        assertTrue(histFav.getLibrary().containsValue(books[0]));
-        assertTrue(histFav.getLibrary().containsValue(books[1]));
-        assertTrue(histFav.getLibrary().containsValue(books[2]));
+        assertTrue(histFav.getLibrary().containsValue(koBooks[0]));
+        assertTrue(histFav.getLibrary().containsValue(koBooks[1]));
+        assertTrue(histFav.getLibrary().containsValue(koBooks[2]));
 
         histFav = new KOReaderHistFav(koreaderDir);
         assertEquals(2, histFav.getFavorites().size());
@@ -68,42 +62,42 @@ public class KOReaderHistFavTest {
     @Test
     public void testAddRemoveBook() {
         // manipulates KOReader setting files history.lua and settings/collection.lua
-        assertTrue(histFav.removeBookFromFavorites(books[0].getFilePath()));
+        assertTrue(histFav.removeBookFromFavorites(koBooks[0].getFilePath()));
         assertEquals(1, histFav.getFavorites().size());
-        assertFalse(histFav.removeBookFromFavorites(books[1].getFilePath()));
+        assertFalse(histFav.removeBookFromFavorites(koBooks[1].getFilePath()));
         assertEquals(1, histFav.getFavorites().size());
-        assertTrue(histFav.removeBookFromFavorites(books[2].getFilePath()));
+        assertTrue(histFav.removeBookFromFavorites(koBooks[2].getFilePath()));
         assertEquals(0, histFav.getFavorites().size());
-        assertTrue(histFav.addBookToFavorites(books[2].getFilePath()));
+        assertTrue(histFav.addBookToFavorites(koBooks[2].getFilePath()));
         assertEquals(1, histFav.getFavorites().size());
-        assertTrue(histFav.addBookToFavorites(books[0].getFilePath()));
+        assertTrue(histFav.addBookToFavorites(koBooks[0].getFilePath()));
         assertEquals(2, histFav.getFavorites().size());
-        assertEquals(books[0], histFav.getFavorites().get(0));
-        assertEquals(books[2], histFav.getFavorites().get(1));
+        assertEquals(koBooks[0], histFav.getFavorites().get(0));
+        assertEquals(koBooks[2], histFav.getFavorites().get(1));
         
-        assertTrue(histFav.removeBookFromHistory(books[0].getFilePath()));
+        assertTrue(histFav.removeBookFromHistory(koBooks[0].getFilePath()));
         assertEquals(1, histFav.getHistory().size());
-        assertTrue(histFav.removeBookFromHistory(books[1].getFilePath()));
+        assertTrue(histFav.removeBookFromHistory(koBooks[1].getFilePath()));
         assertEquals(0, histFav.getHistory().size());
-        assertFalse(histFav.removeBookFromHistory(books[2].getFilePath()));
+        assertFalse(histFav.removeBookFromHistory(koBooks[2].getFilePath()));
         assertEquals(0, histFav.getHistory().size());
-        assertTrue(histFav.addBookToHistory(books[1].getFilePath()));
+        assertTrue(histFav.addBookToHistory(koBooks[1].getFilePath()));
         assertEquals(1, histFav.getHistory().size());
-        assertTrue(histFav.addBookToHistory(books[0].getFilePath()));
+        assertTrue(histFav.addBookToHistory(koBooks[0].getFilePath()));
         assertEquals(2, histFav.getHistory().size());
-        assertEquals(books[0], histFav.getHistory().get(0));
-        assertEquals(books[1], histFav.getHistory().get(1));
+        assertEquals(koBooks[0], histFav.getHistory().get(0));
+        assertEquals(koBooks[1], histFav.getHistory().get(1));
 
-        assertTrue(histFav.removeBookFromLibrary(books[0].getFilePath()));
+        assertTrue(histFav.removeBookFromLibrary(koBooks[0].getFilePath()));
         assertEquals(2, histFav.getLibrary().size());
-        assertTrue(histFav.removeBookFromLibrary(books[1].getFilePath()));
+        assertTrue(histFav.removeBookFromLibrary(koBooks[1].getFilePath()));
         assertEquals(1, histFav.getLibrary().size());
-        assertTrue(histFav.removeBookFromLibrary(books[2].getFilePath()));
+        assertTrue(histFav.removeBookFromLibrary(koBooks[2].getFilePath()));
         assertEquals(0, histFav.getLibrary().size());
-        assertTrue(histFav.addBookToLibrary(books[0].getFilePath()));
+        assertTrue(histFav.addBookToLibrary(koBooks[0].getFilePath()));
         assertEquals(1, histFav.getLibrary().size());
         assertEquals(0, histFav.getFavorites().size());
         assertEquals(0, histFav.getHistory().size());
-        assertFalse(histFav.addBookToLibrary(books[0].getFilePath()));
+        assertFalse(histFav.addBookToLibrary(koBooks[0].getFilePath()));
     }
 }

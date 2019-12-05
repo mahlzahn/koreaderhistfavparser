@@ -1,83 +1,15 @@
 package org.koreaderhistfavparser;
 
-import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.io.File;
-import java.io.IOException;
 
-import static org.junit.Assert.*;
+import static org.testng.Assert.*;
 
 /**
  * Test class for KOReaderBook class.
  */
-public class KOReaderBookTest {
-    private final String resSrcDir = "src/test/res";
-    private final String resBuildDir = "build/test-res";
-    private final String booksDir = resBuildDir + "/books";
-
-    private TestBook[] books = new TestBook[3];
-
-    class TestBook {
-        private KOReaderBook koBook;
-        private String[] authors;
-        private String filePath;
-        private Boolean finished;
-        private String[] keywords;
-        private String language;
-        private Integer pages;
-        private Double percentFinished;
-        private String series;
-        private String title;
-
-        public TestBook(KOReaderBook koBook, String[] authors, String filePath, String title, String[] keywords,
-                        String language, String series, Double percentFinished, Integer pages, Boolean finished) {
-            this.koBook = koBook;
-            this.authors = authors;
-            this.filePath = filePath;
-            this.finished = finished;
-            this.keywords = keywords;
-            this.language = language;
-            this.pages = pages;
-            this.percentFinished = percentFinished;
-            this.series = series;
-            this.title = title;
-        }
-    }
-
-    @Before
-    public void setUp() throws IOException {
-        FileUtils.copyDirectory(new File(resSrcDir), new File(resBuildDir));
-        books[0] = new TestBook(new KOReaderBook(booksDir + "/book1.epub"),
-                new String[] {"Karl May"},
-                booksDir + "/book1.epub",
-                "Durch Wüste und Harem / Gesammelte Reiseromane, Band I",
-                new String[] {"Adventure stories", "Middle East -- Fiction", "German fiction"},
-                "de",
-                "",
-                0.0017699115044248,
-                1130,
-                false);
-        books[1] = new TestBook(new KOReaderBook(booksDir + "/book2.epub"),
-                new String[] {"Max Brod", "Franz Kafka"},
-                booksDir + "/book2.epub",
-                "Erstes Kapitel des Buches \"Richard und Samuel\" / Die erste lange" +
-                        " Eisenbahnfahrt (Prag-Zürich)",
-                new String[] {"Young men -- Fiction", "Male friendship -- Fiction",
-                        "Voyages and travels -- Fiction", "Unfinished books"},
-                "de",
-                "",
-                0.017543859649123,
-                57,
-                true);
-        books[2] = new TestBook(new KOReaderBook(booksDir + "/book3.epub"), // no sdr file
-                null,
-                booksDir + "/book3.epub",
-                null, null, null, null,
-                null, null, false);
-    }
-
+public class KOReaderBookTest extends KOReaderCommonTest {
     @Test
     public void testGetters() {
         for (TestBook book : books) {
@@ -86,10 +18,18 @@ public class KOReaderBookTest {
             assertTrue(new File(book.filePath).exists());
             KOReaderBook koBook = book.koBook;
 
-            assertArrayEquals(book.authors, koBook.getAuthors());
+            if (book.authors != null)
+                for (int i = 0; i < book.authors.length; i++)
+                    assertEquals(book.authors[i], koBook.getAuthors()[i]);
+            else
+                assertNull(koBook.getAuthors());
             assertEquals(book.filePath, koBook.getFilePath());
             assertEquals(book.finished, koBook.getFinished());
-            assertArrayEquals(book.keywords, koBook.getKeywords());
+            if (book.keywords != null)
+                for (int i = 0; i < book.keywords.length; i++)
+                    assertEquals(book.keywords[i], koBook.getKeywords()[i]);
+            else
+                assertNull(koBook.getKeywords());
             assertEquals(book.language, koBook.getLanguage());
             assertEquals((long) 0, (long) koBook.getLastRead());
             assertEquals(book.pages, koBook.getPages());

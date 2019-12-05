@@ -55,7 +55,7 @@ class KOReaderLuaReadWrite {
                     .replaceFirst("return ", "")
                     // "[...] = " --> "...: "
                     //.replaceAll("\\[([0-9]+)\\] =", "\"$1\":")
-                    .replaceAll("\\[([a-zA-Z_0-9\"]+)] =", "$1:")
+                    .replaceAll("\\[\"?([a-zA-Z_0-9]+)\"?] =", "\"$1\":")
                     // arrays in lua given with "\" and new line --> strings with ";;;;" delimiter
                     .replaceAll("\\\\\n", ";;;;")
             );
