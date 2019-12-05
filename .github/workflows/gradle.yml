@@ -1,6 +1,11 @@
 name: Gradle JUnit and JavaDoc tests
 
-on: push
+on:
+  push:
+    paths:
+    - 'src/**'
+    - '**gradle**'
+    - '.github/workflows/gradle.yml'
 
 jobs:
   build:
