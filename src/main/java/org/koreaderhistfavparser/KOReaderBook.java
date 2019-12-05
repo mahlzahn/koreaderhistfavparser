@@ -168,7 +168,7 @@ public class KOReaderBook {
     /**
      * Returns the file path.
      *
-     * @return the file path
+     * @return the book's file path
      */
     public String getFilePath() {
         return filePath;
