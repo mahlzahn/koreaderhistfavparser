@@ -5,6 +5,7 @@ on:
     branches: master
     paths:
     - '**.java'
+    - 'README.md'
 
 jobs:
   build:
