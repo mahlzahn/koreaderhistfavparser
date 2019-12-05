@@ -26,7 +26,7 @@ jobs:
         cp README.md web
         hash=$(git log -1 --format=%H)
         shortHash=$(git log -1 --format=%h)
-        sed -i -E 's/(<\/ul>)/\1\n<p>Repository: <a href="https:\/\/github.com\/mahlzahn\/koreaderhistfavparser" title="GitHub repository of KOReaderHistFavParser" target="_blank">koreaderhistfavparser<\/a><br>\nVersion: <a href="https:\/\/github.com\/mahlzahn\/koreaderhistfavparser\/commit\/'$hash'" title="Commit '$shortHash' on GitHub" target="_blank">'$shortHash'<\/a><\/p>/' /web/docs/allclasses-frame.html
+        sed -i -E 's/(<\/ul>)/\1\n<p>Repository: <a href="https:\/\/github.com\/mahlzahn\/koreaderhistfavparser" title="GitHub repository of KOReaderHistFavParser" target="_blank">koreaderhistfavparser<\/a><br>\nVersion: <a href="https:\/\/github.com\/mahlzahn\/koreaderhistfavparser\/commit\/'$hash'" title="Commit '$shortHash' on GitHub" target="_blank">'$shortHash'<\/a><\/p>/' web/docs/allclasses-frame.html
 
     - name: Deploy changes to gh-pages
       uses: peaceiris/actions-gh-pages@v2.5.0

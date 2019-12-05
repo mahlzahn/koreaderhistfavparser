@@ -94,27 +94,27 @@ public class KOReaderHistFav {
     }
 
     /**
-     * Returns the KOReader settings directory path.
+     * Returns the KOReader settings' directory path.
      *
-     * @return the KOReader settings directory path
+     * @return the KOReader settings' directory path
      */
     public String getKoreaderDirectoryPath() {
         return koreaderDirectoryPath;
     }
 
     /**
-     * Returns the KOReader history file path.
+     * Returns the KOReader history's file path.
      *
-     * @return the kOReader history file path
+     * @return the kOReader history's file path
      */
     public String getKoreaderHistoryFilePath() {
         return historyFilePath;
     }
 
     /**
-     * Returns the KOReader collection file path.
+     * Returns the KOReader collection's file path.
      *
-     * @return the KOReader collection file path
+     * @return the KOReader collection's file path
      */
     public String getKoreaderCollectionFilePath() {
         return collectionFilePath;
@@ -124,7 +124,7 @@ public class KOReaderHistFav {
      * Add book to favorites (and library). If book already in favorites, move book to first
      * position.
      *
-     * @param filePath the book file path
+     * @param filePath the book's file path
      * @return true if successfully, otherwise false
      */
     public Boolean addBookToFavorites(String filePath) {
@@ -145,7 +145,7 @@ public class KOReaderHistFav {
      * Add book to history (and library). If book already in history, move book to first position.
      * Sets book's last reading time to current time.
      *
-     * @param filePath the book file path
+     * @param filePath the book's file path
      * @return true if successfully, otherwise false
      */
     public Boolean addBookToHistory(String filePath) {
@@ -166,7 +166,7 @@ public class KOReaderHistFav {
     /**
      * Add book to library.
      *
-     * @param filePath the book file path
+     * @param filePath the book's file path
      * @return true if successfully, otherwise false
      */
     public Boolean addBookToLibrary(String filePath) {
@@ -230,7 +230,7 @@ public class KOReaderHistFav {
     /**
      * Remove book from favorites.
      *
-     * @param filePath the book file path
+     * @param filePath the book's file path
      * @return true if successfully, otherwise false
      */
     public Boolean removeBookFromFavorites(String filePath) {
@@ -246,7 +246,7 @@ public class KOReaderHistFav {
     /**
      * Remove book from history.
      *
-     * @param filePath the book file path
+     * @param filePath the book's file path
      * @return true if successfully, otherwise false
      */
     public Boolean removeBookFromHistory(String filePath) {
@@ -262,7 +262,7 @@ public class KOReaderHistFav {
     /**
      * Remove book from library (and favorites and history).
      *
-     * @param filePath the book file path
+     * @param filePath the book's file path
      * @return true if successfully, otherwise false
      */
     public Boolean removeBookFromLibrary(String filePath) {
