@@ -2,7 +2,7 @@
 Parser (read and write) for KOReader ([Homepage](https://koreader.rocks), [Github repository](https://github.com/koreader/koreader)) history, favorites and book status for external usage in Android applications
 
 ## Documentation
-Lates documentation of the Java classes on the [master branch of the KOReaderHistFavParser GitHub repository](https://github.com/mahlzahn/koreaderhistfavparser) can be found at [mahlzahn.github.io/koreaderhistfavparser/docs](https://mahlzahn.github.io/koreaderhistfavparser/docs).
+Latest documentation of the Java classes on the [master branch of the KOReaderHistFavParser GitHub repository](https://github.com/mahlzahn/koreaderhistfavparser) can be found at [mahlzahn.github.io/koreaderhistfavparser/docs](https://mahlzahn.github.io/koreaderhistfavparser/docs).
 
 ## Usage
 ```java
