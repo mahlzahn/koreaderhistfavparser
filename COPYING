@@ -1,0 +1,50 @@
+KOReaderHistFavParser: Parser (read and write) for the KOReader
+<https://koreader.rocks> history, favorites and book status
+for external usage in Android applications
+
+Copyright (C) 2019 Robert Wolff <https://github.com/mahlzahn>
+
+This library is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this library. If not, see <https://www.gnu.org/licenses>.
+
+The author(s) of this library permit(s) the redistribution and/or
+modification of the source code in src/main/ to the author(s) of
+the Relaunch application <https://github.com/yiselieren/ReLaunch>
+and any fork of the Relaunch application under the terms of the
+GNU General Public License as published by the Free Software
+Foundation, either version 2 of the License, or any later version.
+
+This library uses the Gradle build tool <https://gradle.org/>,
+available under the terms of the Apache 2.0 license, which can be
+obtained from <http://www.apache.org/licenses>.
+
+This library uses the Android SDK <https://developer.android.com/studio>,
+available under the terms of the Android Software Development Kit
+License Agreement, which can be obtained from
+<https://developer.android.com/studio/terms>
+
+For testing purposes this library uses the JUnit 4 test framework
+<https://junit.org/junit4>, available under the terms of the
+Eclipse Public License 1.0, which can be obtained from
+<https://junit.org/junit4/license.html>.
+
+For testing purposes this library uses the Open JSON library
+<https://github.com/tdunning/open-json/>,
+including (C) 2010 The Android Open Source Project,
+available under the terms of the Apache 2.0 license, which can be
+obtained from <http://www.apache.org/licenses>.
+
+For testing purposes this library uses modified example files,
+created by the KOReader application <http://koreader.rocks>, available
+under the GNU Affero General Public License v3.0, which can be obtained
+from <http://www.gnu.org/licenses>.
