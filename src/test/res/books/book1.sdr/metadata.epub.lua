@@ -1,23 +1,20 @@
 -- we can read Lua syntax here!
 return {
-    ["header_font_face"] = "Noto Sans",
     ["stats"] = {
         ["performance_in_pages"] = {},
-        ["md5"] = "7367ccadec7caa0e1dcf12d108305849",
         ["authors"] = "Karl May",
         ["total_time_in_sec"] = 0,
         ["notes"] = 0,
         ["title"] = "Durch Wüste und Harem / Gesammelte Reiseromane, Band I",
         ["highlights"] = 0,
-        ["pages"] = 1130,
+        ["pages"] = 1000,
         ["series"] = "",
         ["language"] = "de"
     },
     ["doc_props"] = {
         ["title"] = "Durch Wüste und Harem / Gesammelte Reiseromane, Band I",
-        ["keywords"] = "Adventure stories\
-Middle East -- Fiction\
-German fiction",
+        ["keywords"] = "Spaß\
+Abenteuer,
         ["description"] = "",
         ["authors"] = "Karl May",
         ["series"] = "",
