@@ -1,3 +1,27 @@
+/*
+ * Copyright (C) 2019 Robert Wolff <https://github.com/mahlzahn>
+ *
+ * This library is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library. If not, see <https://www.gnu.org/licenses>.
+ *
+ * The author(s) of this library permit(s) the redistribution and/or
+ * modification of the source code in src/main/ to the author(s) of
+ * the Relaunch application <https://github.com/yiselieren/ReLaunch>
+ * and any fork of the Relaunch application under the terms of the
+ * GNU General Public License as published by the Free Software
+ * Foundation, either version 2 of the License, or any later version.
+ */
+
 package org.koreaderhistfavparser;
 
 import org.json.JSONException;

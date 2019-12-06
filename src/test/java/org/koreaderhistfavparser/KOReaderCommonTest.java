@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2019 Robert Wolff <https://github.com/mahlzahn>
+ *
+ * This library is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library. If not, see <https://www.gnu.org/licenses>.
+ */
+
 package org.koreaderhistfavparser;
 
 import org.testng.annotations.BeforeMethod;
@@ -65,11 +82,11 @@ public class KOReaderCommonTest {
                 new String[] {"Karl May"},
                 KOReaderHistFav.uniqueFilePath(booksDir + "/book1.epub"),
                 "Durch Wüste und Harem / Gesammelte Reiseromane, Band I",
-                new String[] {"Adventure stories", "Middle East -- Fiction", "German fiction"},
+                new String[] {"Spaß", "Abenteuer,"},
                 "de",
                 "",
                 0.0017699115044248,
-                1130,
+                1000,
                 false);
         books[1] = new TestBook(
                 new KOReaderBook(KOReaderHistFav.uniqueFilePath(booksDir + "/book2.epub")),
@@ -77,12 +94,11 @@ public class KOReaderCommonTest {
                 KOReaderHistFav.uniqueFilePath(booksDir + "/book2.epub"),
                 "Erstes Kapitel des Buches \"Richard und Samuel\" / Die erste lange" +
                         " Eisenbahnfahrt (Prag-Zürich)",
-                new String[] {"Young men -- Fiction", "Male friendship -- Fiction",
-                        "Voyages and travels -- Fiction", "Unfinished books"},
+                new String[] {"Abenteuer", "Zwei Männer in einem Zug"},
                 "de",
                 "",
                 0.017543859649123,
-                57,
+                60,
                 true);
         books[2] = new TestBook( // no sdr file
                 new KOReaderBook(KOReaderHistFav.uniqueFilePath(booksDir + "/book3.epub")),
