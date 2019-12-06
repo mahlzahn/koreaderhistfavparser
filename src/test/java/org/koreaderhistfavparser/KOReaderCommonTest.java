@@ -17,7 +17,7 @@
 
 package org.koreaderhistfavparser;
 
-import org.testng.annotations.BeforeMethod;
+import org.junit.Before;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,7 +74,7 @@ public class KOReaderCommonTest {
         }
     }
 
-    @BeforeMethod
+    @Before
     public void setUp() throws IOException {
         copyFile(new File(resSrcDir).toPath());
         books[0] = new TestBook(
@@ -82,7 +82,7 @@ public class KOReaderCommonTest {
                 new String[] {"Karl May"},
                 KOReaderHistFav.uniqueFilePath(booksDir + "/book1.epub"),
                 "Durch Wüste und Harem / Gesammelte Reiseromane, Band I",
-                new String[] {"Spaß", "Abenteuer,"},
+                new String[] {"Spaß", "Abenteuer"},
                 "de",
                 "",
                 0.0017699115044248,

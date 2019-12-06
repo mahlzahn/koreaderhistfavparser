@@ -17,7 +17,7 @@ Franz Kafka",
     ["doc_props"] = {
         ["title"] = "Erstes Kapitel des Buches \"Richard und Samuel\" / Die erste lange Eisenbahnfahrt (Prag-Zürich)",
         ["keywords"] = "Abenteuer\
-Zwei Männer in einem Zug,
+Zwei Männer in einem Zug",
         ["description"] = "",
         ["authors"] = "Max Brod\
 Franz Kafka",
