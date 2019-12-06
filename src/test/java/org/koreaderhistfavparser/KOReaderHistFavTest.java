@@ -17,13 +17,13 @@
 
 package org.koreaderhistfavparser;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import static org.testng.Assert.*;
+import static org.junit.Assert.*;
 
 /**
  * Test class for KOReaderHistFav class.
@@ -34,7 +34,7 @@ public class KOReaderHistFavTest extends KOReaderCommonTest {
     private KOReaderHistFav histFav;
     private KOReaderBook[] koBooks = new KOReaderBook[3];
 
-    @BeforeMethod
+    @Before
     public void setUp() throws IOException {
         super.setUp();
         histFav = new KOReaderHistFav(koreaderDir);

@@ -6,6 +6,8 @@ on:
     paths:
     - '**.java'
     - 'README.md'
+    - 'COPYING'
+    - 'LICENSE'
     - '.github/workflows/publish-javadoc.yml'
 
 jobs:
@@ -25,7 +27,7 @@ jobs:
       run: |
         mkdir web
         javadoc -package -notree -nonavbar -noindex -d web/docs $(find src/main/java -name *.java) -classpath /usr/local/lib/android/sdk/platforms/android-29/android.jar
-        cp README.md web
+        cp COPYING LICENSE README.md web
         hash=$(git log -1 --format=%H)
         shortHash=$(git log -1 --format=%h)
         sed -i -E 's/(<\/ul>)/\1\n<p>Repository: <a href="https:\/\/github.com\/mahlzahn\/koreaderhistfavparser" title="GitHub repository of KOReaderHistFavParser" target="_blank">koreaderhistfavparser<\/a><br>\nVersion: <a href="https:\/\/github.com\/mahlzahn\/koreaderhistfavparser\/commit\/'$hash'" title="Commit '$shortHash' on GitHub" target="_blank">'$shortHash'<\/a><\/p>/' web/docs/allclasses-frame.html

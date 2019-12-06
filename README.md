@@ -28,3 +28,11 @@ KOReaderHistFav.removeBookFromHistory("/path/to/ebook1");  // removes ebook1 fro
                                                            // favorites and internal library
 KOReaderHistFav.removeBookFromLibrary("/path/to/ebook2");  // removes ebook2 from favorites and library
 ```
+
+## License
+This library is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+any later version.
+
+See details in the [COPYING](COPYING) file.

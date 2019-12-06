@@ -14,7 +14,7 @@ return {
     ["doc_props"] = {
         ["title"] = "Durch Wüste und Harem / Gesammelte Reiseromane, Band I",
         ["keywords"] = "Spaß\
-Abenteuer,
+Abenteuer",
         ["description"] = "",
         ["authors"] = "Karl May",
         ["series"] = "",

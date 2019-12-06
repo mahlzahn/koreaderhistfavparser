@@ -30,8 +30,8 @@ allprojects {
 }
 
 dependencies {
-    testImplementation 'org.testng:testng:7.0.0'
-    testImplementation 'com.vaadin.external.google:android-json:0.0.20131108.vaadin1'
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'com.tdunning:json:1.8'
 }
 
 tasks.withType(Test) { task ->
