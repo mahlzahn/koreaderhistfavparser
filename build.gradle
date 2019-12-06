@@ -33,3 +33,9 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     testImplementation 'com.tdunning:json:1.8'
 }
+
+tasks.withType(Test) { task ->
+    task.afterTest { desc, result ->
+        println "Ran test ${desc.name} [${desc.className}] with result: ${result.resultType}"
+    }
+}

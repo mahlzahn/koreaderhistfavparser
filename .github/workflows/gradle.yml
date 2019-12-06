@@ -4,7 +4,7 @@ on:
   push:
     paths:
     - 'src/**'
-    - '**gradle**'
+    - 'build.gradle'
     - '.github/workflows/gradle.yml'
 
 jobs:
@@ -22,8 +22,7 @@ jobs:
         java-version: 1.8
 
     - name: Test with Gradle
-      run: ./gradlew testDebugUnitTest --info
-      continue-on-error: true
+      run: gradle testDebugUnitTest
 
     - name: Create JavaDoc documentation
       run: | 
