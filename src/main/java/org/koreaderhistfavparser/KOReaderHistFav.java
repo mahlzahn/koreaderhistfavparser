@@ -159,8 +159,7 @@ public class KOReaderHistFav {
             book = new KOReaderBook(filePath);
             books.put(filePath, book);
         }
-        if (favorites.contains(book))
-            favorites.remove(book);
+        favorites.remove(book);
         favorites.add(0, book);
         return writeFavorites();
     }
@@ -180,8 +179,7 @@ public class KOReaderHistFav {
             book = new KOReaderBook(filePath);
             books.put(filePath, book);
         }
-        if (history.contains(book))
-            history.remove(book);
+        history.remove(book);
         book.setLastRead(new Date().getTime());
         history.add(0, book);
         return writeHistory();
@@ -362,11 +360,12 @@ public class KOReaderHistFav {
         }
         if (historyJson == null)
             return false;
+        boolean foundDuplicates = false;
         history.clear();
         Iterator keys = historyJson.keys();
         while (keys.hasNext()) {
             String key = (String) keys.next();
-            JSONObject keyjson = null;
+            JSONObject keyjson;
             String filePath;
             Long lastRead;
             try {
@@ -381,14 +380,19 @@ public class KOReaderHistFav {
             KOReaderBook book;
             if (books.containsKey(filePath)) {
                 book = books.get(filePath);
+                int iBookInHistory = history.indexOf(book);
+                if (iBookInHistory != -1) {
+                    foundDuplicates = true;
+                    if (lastRead > history.get(iBookInHistory).getLastRead())
+                        history.remove(iBookInHistory);
+                    else
+                        continue;
+                }
             } else {
                 book = new KOReaderBook(filePath);
                 books.put(filePath, book);
             }
-            if (history.contains(book) && book.getLastRead() >= lastRead)
-                continue;
             book.setLastRead(lastRead);
-            history.remove(book);
             int historySize = history.size();
             if (historySize == 0) {
                 history.add(book);
@@ -406,6 +410,8 @@ public class KOReaderHistFav {
         }
         Log.d(TAG, "--- readBooksFromHistory() successfully. Added "
                 + history.size() + " books.");
+        if (foundDuplicates && writeHistory())
+            Log.d(TAG, "--- readBooksFromHistory(): Found duplicates, wrote history file.");
         return true;
     }
 
@@ -421,7 +427,11 @@ public class KOReaderHistFav {
         } catch (JSONException e) {
             return false;
         }
-        return KOReaderLuaReadWrite.writeLuaFile(historyFilePath, historyJson);
+        if (KOReaderLuaReadWrite.writeLuaFile(historyFilePath, historyJson)) {
+            historyLastModified = new File(historyFilePath).lastModified();
+            return true;
+        }
+        return false;
     }
 
     private Boolean collectionFileModified() {
@@ -440,13 +450,13 @@ public class KOReaderHistFav {
         JSONObject favoritesJson = collectionJson.optJSONObject("favorites");
         if (favoritesJson == null)
             return false;
+        boolean foundDuplicates = false;
         favorites.clear();
         ArrayList<Integer> favoritesOrder = new ArrayList<>();
-        //SparseArray<KOReaderBook> booksArray = new SparseArray<>();
         Iterator keys = favoritesJson.keys();
         while (keys.hasNext()) {
             String key = (String) keys.next();
-            JSONObject keyjson = null;
+            JSONObject keyjson;
             String filePath;
             Integer order;
             try {
@@ -461,23 +471,20 @@ public class KOReaderHistFav {
             KOReaderBook book;
             if (books.containsKey(filePath)) {
                 book = books.get(filePath);
+                int iBookInFavorites = favorites.indexOf(book);
+                if (iBookInFavorites != -1) {
+                    foundDuplicates = true;
+                    if (order < favoritesOrder.get(iBookInFavorites)) {
+                        favorites.remove(iBookInFavorites);
+                        favoritesOrder.remove(iBookInFavorites);
+                    } else {
+                        continue;
+                    }
+                }
             } else {
                 book = new KOReaderBook(filePath);
                 books.put(filePath, book);
             }
-            Boolean bookAlreadyInFavorites = false;
-            for (int i = 0; i < favorites.size(); i++) {
-                if (book.equals(favorites.get(i)))
-                    if (order > favoritesOrder.get(i)) {
-                        favorites.remove(i);
-                        favoritesOrder.remove(i);
-                        i--;
-                    } else {
-                        bookAlreadyInFavorites = true;
-                    }
-            }
-            if (bookAlreadyInFavorites)
-                continue;
             int favoritesSize = favorites.size();
             if (favoritesSize == 0) {
                 favorites.add(book);
@@ -498,6 +505,8 @@ public class KOReaderHistFav {
         }
         Log.d(TAG, "--- readBooksFromFavorites() successfully. Added "
                 + favorites.size() + " books.");
+        if (foundDuplicates && writeFavorites())
+            Log.d(TAG, "--- readBooksFromFavorites(): Found duplicates, wrote favorites file.");
         return true;
     }
 
@@ -514,6 +523,10 @@ public class KOReaderHistFav {
         } catch (JSONException e) {
             return false;
         }
-        return KOReaderLuaReadWrite.writeLuaFile(collectionFilePath, collectionJson);
+        if (KOReaderLuaReadWrite.writeLuaFile(collectionFilePath, collectionJson)) {
+            collectionLastModified = new File(collectionFilePath).lastModified();
+            return true;
+        }
+        return false;
     }
 }

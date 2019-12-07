@@ -119,7 +119,7 @@ class KOReaderLuaReadWrite {
                 // strings with ";;;;" delimiter --> arrays in lua given with "\" and new line
                 .replaceAll(";;;;", "\\\\\n")
                 // nice formatting without one liners like '["a"] = {["b"] = "c"}'
-                .replaceAll("( *)(.*)\\{(.*)}", "$1$2{\n$1    $3\n$1}")
+                .replaceAll("( *)(.*)\\{(.+)\\}", "$1$2{\n$1    $3\n$1}")
                 // paths get messed up with some implementations of JSON
                 .replaceAll("\\\\/", "/")
                 + "\n";
