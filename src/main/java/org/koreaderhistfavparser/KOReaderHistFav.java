@@ -429,6 +429,8 @@ public class KOReaderHistFav {
         }
         if (KOReaderLuaReadWrite.writeLuaFile(historyFilePath, historyJson)) {
             historyLastModified = new File(historyFilePath).lastModified();
+            Log.d(TAG, "--- writeHistory() successfully. Saved list with "
+                    + history.size() + " books.");
             return true;
         }
         return false;
@@ -525,6 +527,8 @@ public class KOReaderHistFav {
         }
         if (KOReaderLuaReadWrite.writeLuaFile(collectionFilePath, collectionJson)) {
             collectionLastModified = new File(collectionFilePath).lastModified();
+            Log.d(TAG, "--- writeFavorites() successfully. Saved list with "
+                    + favorites.size() + " books.");
             return true;
         }
         return false;

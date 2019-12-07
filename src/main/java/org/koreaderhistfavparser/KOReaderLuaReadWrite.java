@@ -24,6 +24,8 @@
 
 package org.koreaderhistfavparser;
 
+// import android.util.Log;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -69,7 +71,9 @@ class KOReaderLuaReadWrite {
             e.printStackTrace();
             return null;
         }
-        String content = stringBuilder.toString()
+        String content = stringBuilder.toString();
+        // Log.d(KOReaderLuaReadWrite.class.getSimpleName(), "READ:\n" + content);
+        content = content
                 // line comments starting with --
                 .replaceAll("^--.*\n", "")
                 // first code line in KOReader lua files is always "return {"
@@ -123,9 +127,12 @@ class KOReaderLuaReadWrite {
                 // paths get messed up with some implementations of JSON
                 .replaceAll("\\\\/", "/")
                 + "\n";
+        // Log.d(KOReaderLuaReadWrite.class.getSimpleName(), "WRITE:\n" + content);
         FileOutputStream fos;
         try {
-            new File(filePath).getParentFile().mkdirs();
+            File parent = new File(filePath).getParentFile();
+            if (parent != null)
+                parent.mkdirs();
             fos = new FileOutputStream(filePath);
             fos.write(content.getBytes());
             fos.close();
