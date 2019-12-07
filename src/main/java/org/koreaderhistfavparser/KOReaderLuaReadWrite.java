@@ -69,20 +69,18 @@ class KOReaderLuaReadWrite {
             e.printStackTrace();
             return null;
         }
-
-        String content = stringBuilder.toString();
+        String content = stringBuilder.toString()
+                // line comments starting with --
+                .replaceAll("^--.*\n", "")
+                // first code line in KOReader lua files is always "return {"
+                .replaceFirst("return ", "")
+                // "[...] = " --> "...: "
+                //.replaceAll("\\[([0-9]+)\\] =", "\"$1\":")
+                .replaceAll("\\[\"?([^\"\\[\\]{}]+)\"?] =", "\"$1\":")
+                // arrays in lua given with "\" and new line --> strings with ";;;;" delimiter
+                .replaceAll("\\\\\n", ";;;;");
         try {
-            return new JSONObject(content
-                    // line comments starting with --
-                    .replaceAll("^--.*\n", "")
-                    // first code line in KOReader lua files is always "return {"
-                    .replaceFirst("return ", "")
-                    // "[...] = " --> "...: "
-                    //.replaceAll("\\[([0-9]+)\\] =", "\"$1\":")
-                    .replaceAll("\\[\"?([a-zA-Z_0-9]+)\"?] =", "\"$1\":")
-                    // arrays in lua given with "\" and new line --> strings with ";;;;" delimiter
-                    .replaceAll("\\\\\n", ";;;;")
-            );
+            return new JSONObject(content);
         } catch (JSONException e) {
             e.printStackTrace();
             return null;
@@ -122,6 +120,8 @@ class KOReaderLuaReadWrite {
                 .replaceAll(";;;;", "\\\\\n")
                 // nice formatting without one liners like '["a"] = {["b"] = "c"}'
                 .replaceAll("( *)(.*)\\{(.*)}", "$1$2{\n$1    $3\n$1}")
+                // paths get messed up with some implementations of JSON
+                .replaceAll("\\\\/", "/")
                 + "\n";
         FileOutputStream fos;
         try {
