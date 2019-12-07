@@ -385,7 +385,10 @@ public class KOReaderHistFav {
                 book = new KOReaderBook(filePath);
                 books.put(filePath, book);
             }
+            if (history.contains(book) && book.getLastRead() >= lastRead)
+                continue;
             book.setLastRead(lastRead);
+            history.remove(book);
             int historySize = history.size();
             if (historySize == 0) {
                 history.add(book);
@@ -462,6 +465,19 @@ public class KOReaderHistFav {
                 book = new KOReaderBook(filePath);
                 books.put(filePath, book);
             }
+            Boolean bookAlreadyInFavorites = false;
+            for (int i = 0; i < favorites.size(); i++) {
+                if (book.equals(favorites.get(i)))
+                    if (order > favoritesOrder.get(i)) {
+                        favorites.remove(i);
+                        favoritesOrder.remove(i);
+                        i--;
+                    } else {
+                        bookAlreadyInFavorites = true;
+                    }
+            }
+            if (bookAlreadyInFavorites)
+                continue;
             int favoritesSize = favorites.size();
             if (favoritesSize == 0) {
                 favorites.add(book);
