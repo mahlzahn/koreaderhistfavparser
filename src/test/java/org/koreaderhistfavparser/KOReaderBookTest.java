@@ -91,10 +91,10 @@ public class KOReaderBookTest extends KOReaderCommonTest {
     @Test
     public void testStringFormatting() {
         assertEquals("[%a: ]%t[ (%p%)]", KOReaderBook.getStringFormat());
-        assertEquals("Karl May: Durch Wüste und Harem / Gesammelte Reiseromane, Band I (0%)",
+        assertEquals(books[0].authors[0] + ": " + books[0].title + " (0%)",
                 books[0].koBook.toString());
-        assertEquals("Max Brod: Erstes Kapitel des Buches \"Richard und Samuel\" / Die erste" +
-                " lange Eisenbahnfahrt (Prag-Zürich) (2%)", books[1].koBook.toString());
+        assertEquals(books[1].authors[0] + ": " + books[1].title + " (2%)",
+                books[1].koBook.toString());
         assertEquals("(no title)", books[2].koBook.toString());
 
         KOReaderBook.setStringFormat("[(series %s[, %l]) ]%a[ (%l)]");
@@ -102,6 +102,13 @@ public class KOReaderBookTest extends KOReaderCommonTest {
         assertEquals("Karl May (de)", books[0].koBook.toString());
         assertEquals("Max Brod (de)", books[1].koBook.toString());
         assertEquals("(no author)", books[2].koBook.toString());
+
+
+        KOReaderBook.setStringFormat("%d/%f");
+        assertEquals(books[0].filePath, books[0].koBook.toString());
+        assertEquals(books[1].filePath, books[1].koBook.toString());
+        assertEquals(books[2].filePath, books[2].koBook.toString());
+
         KOReaderBook.setStringFormat(null);
     }
 }

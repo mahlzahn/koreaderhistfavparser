@@ -68,8 +68,10 @@ public class KOReaderBook {
      *     <li><code>%t: title</code>,</li>
      *     <li><code>%a: first author</code>,</li>
      *     <li><code>%p: progress in percent</code>,</li>
-     *     <li><code>%s: series</code> and </li>
-     *     <li><code>%l: language.</code>
+     *     <li><code>%s: series</code>,</li>
+     *     <li><code>%l: language</code>,</li>
+     *     <li><code>%f: file name</code> and</li>
+     *     <li><code>%d: directory</code>.
      * </ul>
      * Optional classifiers are set by square brackets.
      * Defaults to <code>[%a: ]%t[ (%p%)]</code>.
@@ -86,8 +88,10 @@ public class KOReaderBook {
      *     <li><code>%t: title</code>,</li>
      *     <li><code>%a: first author</code>,</li>
      *     <li><code>%p: progress in percent</code>,</li>
-     *     <li><code>%s: series</code> and </li>
-     *     <li><code>%l: language.</code>
+     *     <li><code>%s: series</code>,</li>
+     *     <li><code>%l: language</code>,</li>
+     *     <li><code>%f: file name</code> and</li>
+     *     <li><code>%d: directory</code>.
      * </ul>
      * Optional classifiers are set by square brackets.
      * Defaults to <code>[%a: ]%t[ (%p%)]</code>.
@@ -134,8 +138,10 @@ public class KOReaderBook {
      *     <li><code>%t: title</code>,</li>
      *     <li><code>%a: first author</code>,</li>
      *     <li><code>%p: progress in percent</code>,</li>
-     *     <li><code>%s: series</code> and </li>
-     *     <li><code>%l: language.</code>
+     *     <li><code>%s: series</code>,</li>
+     *     <li><code>%l: language</code>,</li>
+     *     <li><code>%f: file name</code> and</li>
+     *     <li><code>%d: directory</code>.
      * </ul>
      * Optional classifiers are set by square brackets. The string format can be set by
      * {@link #setStringFormat} and is returned by {@link #getStringFormat}. It defaults to
@@ -171,7 +177,17 @@ public class KOReaderBook {
             if (language != null && !language.equals(""))
                 output = output.replace("%l", language);
         }
-        String r1 = "\\[[^\\[\\]]*%[tapsl][^\\[\\]]*\\]";   // matches e.g. [%a: ], [ (%p%)]
+        if (output.contains("%f")) {
+            String fileName = new File(getFilePath()).getName();
+            output = output.replace("%f", fileName);
+        }
+
+        if (output.contains("%d")) {
+            String dirName = new File(getFilePath()).getParent();
+            if (dirName != null)
+                output = output.replace("%d", dirName);
+        }
+        String r1 = "\\[[^\\[\\]]*%[tapslfd][^\\[\\]]*\\]"; // matches e.g. [%a: ], [ (%p%)]
         String r2 = "\\[([^\\[\\]]*)\\]";                   // e.g. [XY: ], [ (24%)], not [*[*]*]
         while (output.matches(".*" + r2 + ".*")) {
             while (output.matches(".*" + r1 + ".*")) {
@@ -183,9 +199,11 @@ public class KOReaderBook {
         // if not optional by [] and not replaced above, replace by following terms
         output = output.replaceAll("%t", "(no title)");
         output = output.replaceAll("%a", "(no author)");
-        output = output.replaceAll("%p", "(no progress)");
+        output = output.replaceAll("%p", "0");
         output = output.replaceAll("%s", "(no series)");
         output = output.replaceAll("%l", "(no language)");
+        output = output.replaceAll("%d", "(no file)");
+        output = output.replaceAll("%d", "(no directory)");
         return output;
     }
 
