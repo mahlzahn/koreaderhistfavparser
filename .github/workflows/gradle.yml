@@ -21,9 +21,8 @@ jobs:
       with:
         java-version: 1.8
 
-    - name: Test with Gradle
-      run: gradle testDebugUnitTest
+    - name: Run JUnit test with Gradle
+      run: gradle test
 
-    - name: Create JavaDoc documentation
-      run: | 
-        javadoc -package -notree -nonavbar -noindex -d javadoc-html $(find src/main/java -name *.java) -classpath /usr/local/lib/android/sdk/platforms/android-29/android.jar
+    - name: Create JavaDoc with Gradle
+      run: gradle javadoc

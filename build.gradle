@@ -16,3 +16,10 @@ tasks.withType(Test) { task ->
         println "Ran test ${desc.name} [${desc.className}] with result: ${result.resultType}"
     }
 }
+
+javadoc {
+    options.addBooleanOption('package', true)
+    options.addBooleanOption('notree', true)
+    options.addBooleanOption('noindex', true)
+    options.addBooleanOption('nonavbar', true)
+}
