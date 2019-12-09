@@ -24,9 +24,6 @@
 
 package org.koreaderhistfavparser;
 
-import android.os.Environment;
-import android.util.Log;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -42,11 +39,7 @@ import java.util.Iterator;
  * The class for KOReader history and favorites management.
  */
 public class KOReaderHistFav {
-    private final static String TAG = "KOReaderHistFav";
-
-    // automatically detected external storage path during construction
-    private static String externalStoragePath;
-    private final static String EXTERNAL_STORAGE_PATH_DEFAULT = "/storage/emulated/0";
+    private static String externalStoragePath = "/storage/emulated/0";
 
     // something like "/storage/emulated/0/koreader"
     private String koreaderDirectoryPath;
@@ -83,22 +76,14 @@ public class KOReaderHistFav {
         this.koreaderDirectoryPath = koreaderDirectoryPath(koreaderDirectoryPath);
         historyFilePath = this.koreaderDirectoryPath + "/" + HISTORY_FILE_PATH;
         collectionFilePath = this.koreaderDirectoryPath + "/" + COLLECTION_FILE_PATH;
-        Log.d(TAG, "Set up with history file " + historyFilePath
-                + " and with collection file " + collectionFilePath);
     }
 
     /**
-     * Returns the external storage path for books. Defaults to "/mnt/sdcard".
+     * Returns the external storage path for books. Defaults to <code>/storage/emulated/0</code>.
      *
      * @return the external storage path
      */
     public static String getExternalStoragePath() {
-        if (externalStoragePath == null)
-            try {
-                externalStoragePath = Environment.getExternalStorageDirectory().getCanonicalPath();
-            } catch (IOException | NullPointerException e) {
-                externalStoragePath = EXTERNAL_STORAGE_PATH_DEFAULT;
-            }
         return externalStoragePath;
     }
 
@@ -408,10 +393,6 @@ public class KOReaderHistFav {
                 }
             }
         }
-        Log.d(TAG, "--- readBooksFromHistory() successfully. Added "
-                + history.size() + " books.");
-        if (foundDuplicates && writeHistory())
-            Log.d(TAG, "--- readBooksFromHistory(): Found duplicates, wrote history file.");
         return true;
     }
 
@@ -429,8 +410,6 @@ public class KOReaderHistFav {
         }
         if (KOReaderLuaReadWrite.writeLuaFile(historyFilePath, historyJson)) {
             historyLastModified = new File(historyFilePath).lastModified();
-            Log.d(TAG, "--- writeHistory() successfully. Saved list with "
-                    + history.size() + " books.");
             return true;
         }
         return false;
@@ -505,10 +484,6 @@ public class KOReaderHistFav {
                 }
             }
         }
-        Log.d(TAG, "--- readBooksFromFavorites() successfully. Added "
-                + favorites.size() + " books.");
-        if (foundDuplicates && writeFavorites())
-            Log.d(TAG, "--- readBooksFromFavorites(): Found duplicates, wrote favorites file.");
         return true;
     }
 
@@ -527,8 +502,6 @@ public class KOReaderHistFav {
         }
         if (KOReaderLuaReadWrite.writeLuaFile(collectionFilePath, collectionJson)) {
             collectionLastModified = new File(collectionFilePath).lastModified();
-            Log.d(TAG, "--- writeFavorites() successfully. Saved list with "
-                    + favorites.size() + " books.");
             return true;
         }
         return false;

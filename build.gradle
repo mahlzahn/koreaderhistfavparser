@@ -1,37 +1,14 @@
-apply plugin: 'com.android.library'
-
-buildscript {
-    repositories {
-        jcenter()
-        google()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.3'
-    }
-}
-
-android {
-    compileSdkVersion = 29
-    buildToolsVersion = '29.0.2'
-    compileOptions {
-        sourceCompatibility = 1.7
-        targetCompatibility = 1.7
-    }
-    testOptions {
-        unitTests.returnDefaultValues = true
-    }
-}
+apply plugin: 'java'
 
 allprojects {
     repositories {
         jcenter()
-        google()
     }
 }
 
 dependencies {
+    implementation 'com.tdunning:json:1.8'
     testImplementation 'junit:junit:4.12'
-    testImplementation 'com.tdunning:json:1.8'
 }
 
 tasks.withType(Test) { task ->

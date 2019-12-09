@@ -24,8 +24,6 @@
 
 package org.koreaderhistfavparser;
 
-// import android.util.Log;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -72,7 +70,6 @@ class KOReaderLuaReadWrite {
             return null;
         }
         String content = stringBuilder.toString();
-        // Log.d(KOReaderLuaReadWrite.class.getSimpleName(), "READ:\n" + content);
         content = content
                 // line comments starting with --
                 .replaceAll("^--.*\n", "")
@@ -127,7 +124,6 @@ class KOReaderLuaReadWrite {
                 // paths get messed up with some implementations of JSON
                 .replaceAll("\\\\/", "/")
                 + "\n";
-        // Log.d(KOReaderLuaReadWrite.class.getSimpleName(), "WRITE:\n" + content);
         FileOutputStream fos;
         try {
             File parent = new File(filePath).getParentFile();
