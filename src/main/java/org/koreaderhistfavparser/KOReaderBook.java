@@ -181,7 +181,6 @@ public class KOReaderBook {
             String fileName = new File(getFilePath()).getName();
             output = output.replace("%f", fileName);
         }
-
         if (output.contains("%d")) {
             String dirName = new File(getFilePath()).getParent();
             if (dirName != null)
@@ -202,7 +201,7 @@ public class KOReaderBook {
         output = output.replaceAll("%p", "0");
         output = output.replaceAll("%s", "(no series)");
         output = output.replaceAll("%l", "(no language)");
-        output = output.replaceAll("%d", "(no file)");
+        output = output.replaceAll("%f", "(no file)");
         output = output.replaceAll("%d", "(no directory)");
         return output;
     }
